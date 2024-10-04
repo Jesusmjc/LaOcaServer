@@ -1,0 +1,499 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="LaOcaBDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Amistades">
+          <Key>
+            <PropertyRef Name="IdAmistad" />
+          </Key>
+          <Property Name="IdAmistad" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="estado" Type="nvarchar" MaxLength="10" />
+          <Property Name="fecha" Type="date" />
+          <Property Name="IdJugadorSolicitante" Type="int" />
+          <Property Name="IdJugadorReceptor" Type="int" />
+        </EntityType>
+        <EntityType Name="Aspectos">
+          <Key>
+            <PropertyRef Name="IdAspecto" />
+          </Key>
+          <Property Name="IdAspecto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="tipo" Type="nvarchar" MaxLength="10" />
+          <Property Name="referencia" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Cuentas">
+          <Key>
+            <PropertyRef Name="IdCuenta" />
+          </Key>
+          <Property Name="IdCuenta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="correoElectronico" Type="nvarchar" MaxLength="60" />
+          <Property Name="contrasena" Type="nvarchar" MaxLength="64" />
+          <Property Name="IdJugador" Type="int" />
+        </EntityType>
+        <EntityType Name="Jugadores">
+          <Key>
+            <PropertyRef Name="IdJugador" />
+          </Key>
+          <Property Name="IdJugador" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombreUsuario" Type="nvarchar" MaxLength="40" />
+          <Property Name="nombre" Type="nvarchar" MaxLength="40" />
+          <Property Name="apellidoPaterno" Type="nvarchar" MaxLength="40" />
+          <Property Name="apellidoMaterno" Type="nvarchar" MaxLength="40" />
+          <Property Name="IdPuntuacion" Type="int" />
+          <Property Name="IdFotoPerfil" Type="int" />
+          <Property Name="IdCuenta" Type="int" />
+        </EntityType>
+        <EntityType Name="JugadoresAspectos">
+          <Key>
+            <PropertyRef Name="IdJugadorAspecto" />
+          </Key>
+          <Property Name="IdJugadorAspecto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdJugador" Type="int" />
+          <Property Name="IdAspecto" Type="int" />
+        </EntityType>
+        <EntityType Name="Puntuaciones">
+          <Key>
+            <PropertyRef Name="IdPuntuacion" />
+          </Key>
+          <Property Name="IdPuntuacion" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="casillasRecorridasGlobal" Type="int" />
+          <Property Name="monedasObtenidasGlobal" Type="int" />
+          <Property Name="partidasGanadasGlobal" Type="int" />
+          <Property Name="monedasActuales" Type="int" />
+          <Property Name="IdJugador" Type="int" />
+        </EntityType>
+        <Association Name="FK_Amistades_JugadorReceptor">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1" />
+          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="Amistades">
+              <PropertyRef Name="IdJugadorReceptor" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Amistades_JugadorSolicitante">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="Amistades">
+              <PropertyRef Name="IdJugadorSolicitante" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_Cuenta">
+          <End Role="Cuentas" Type="Self.Cuentas" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuentas">
+              <PropertyRef Name="IdCuenta" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_FotoPerfil">
+          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Aspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdFotoPerfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_Puntuacion">
+          <End Role="Puntuaciones" Type="Self.Puntuaciones" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Puntuaciones">
+              <PropertyRef Name="IdPuntuacion" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdPuntuacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_JugadorAspecto_Aspecto">
+          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1" />
+          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Aspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Principal>
+            <Dependent Role="JugadoresAspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_JugadorAspecto_Jugador">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="JugadoresAspectos">
+              <PropertyRef Name="IdJugador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="LaOcaBDModelStoreContainer">
+          <EntitySet Name="Amistades" EntityType="Self.Amistades" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Aspectos" EntityType="Self.Aspectos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Cuentas" EntityType="Self.Cuentas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Jugadores" EntityType="Self.Jugadores" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="JugadoresAspectos" EntityType="Self.JugadoresAspectos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Puntuaciones" EntityType="Self.Puntuaciones" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Amistades_JugadorReceptor" Association="Self.FK_Amistades_JugadorReceptor">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="Amistades" EntitySet="Amistades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Amistades_JugadorSolicitante" Association="Self.FK_Amistades_JugadorSolicitante">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="Amistades" EntitySet="Amistades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_Cuenta" Association="Self.FK_Jugador_Cuenta">
+            <End Role="Cuentas" EntitySet="Cuentas" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_FotoPerfil" Association="Self.FK_Jugador_FotoPerfil">
+            <End Role="Aspectos" EntitySet="Aspectos" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_Puntuacion" Association="Self.FK_Jugador_Puntuacion">
+            <End Role="Puntuaciones" EntitySet="Puntuaciones" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_JugadorAspecto_Aspecto" Association="Self.FK_JugadorAspecto_Aspecto">
+            <End Role="Aspectos" EntitySet="Aspectos" />
+            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_JugadorAspecto_Jugador" Association="Self.FK_JugadorAspecto_Jugador">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="LaOcaBDModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Amistades">
+          <Key>
+            <PropertyRef Name="IdAmistad" />
+          </Key>
+          <Property Name="IdAmistad" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="estado" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="fecha" Type="DateTime" Precision="0" />
+          <Property Name="IdJugadorSolicitante" Type="Int32" />
+          <Property Name="IdJugadorReceptor" Type="Int32" />
+          <NavigationProperty Name="Jugadores" Relationship="Self.FK_Amistades_JugadorReceptor" FromRole="Amistades" ToRole="Jugadores" />
+          <NavigationProperty Name="Jugadores1" Relationship="Self.FK_Amistades_JugadorSolicitante" FromRole="Amistades" ToRole="Jugadores" />
+        </EntityType>
+        <EntityType Name="Aspectos">
+          <Key>
+            <PropertyRef Name="IdAspecto" />
+          </Key>
+          <Property Name="IdAspecto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="tipo" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="referencia" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Jugadores" Relationship="Self.FK_Jugador_FotoPerfil" FromRole="Aspectos" ToRole="Jugadores" />
+          <NavigationProperty Name="JugadoresAspectos" Relationship="Self.FK_JugadorAspecto_Aspecto" FromRole="Aspectos" ToRole="JugadoresAspectos" />
+        </EntityType>
+        <EntityType Name="Cuentas">
+          <Key>
+            <PropertyRef Name="IdCuenta" />
+          </Key>
+          <Property Name="IdCuenta" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="correoElectronico" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="contrasena" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="IdJugador" Type="Int32" />
+          <NavigationProperty Name="Jugadores" Relationship="Self.FK_Jugador_Cuenta" FromRole="Cuentas" ToRole="Jugadores" />
+        </EntityType>
+        <EntityType Name="Jugadores">
+          <Key>
+            <PropertyRef Name="IdJugador" />
+          </Key>
+          <Property Name="IdJugador" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombreUsuario" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="nombre" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="apellidoPaterno" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="apellidoMaterno" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="IdPuntuacion" Type="Int32" />
+          <Property Name="IdFotoPerfil" Type="Int32" />
+          <Property Name="IdCuenta" Type="Int32" />
+          <NavigationProperty Name="Amistades" Relationship="Self.FK_Amistades_JugadorReceptor" FromRole="Jugadores" ToRole="Amistades" />
+          <NavigationProperty Name="Amistades1" Relationship="Self.FK_Amistades_JugadorSolicitante" FromRole="Jugadores" ToRole="Amistades" />
+          <NavigationProperty Name="Aspectos" Relationship="Self.FK_Jugador_FotoPerfil" FromRole="Jugadores" ToRole="Aspectos" />
+          <NavigationProperty Name="Cuentas" Relationship="Self.FK_Jugador_Cuenta" FromRole="Jugadores" ToRole="Cuentas" />
+          <NavigationProperty Name="Puntuaciones" Relationship="Self.FK_Jugador_Puntuacion" FromRole="Jugadores" ToRole="Puntuaciones" />
+          <NavigationProperty Name="JugadoresAspectos" Relationship="Self.FK_JugadorAspecto_Jugador" FromRole="Jugadores" ToRole="JugadoresAspectos" />
+        </EntityType>
+        <EntityType Name="JugadoresAspectos">
+          <Key>
+            <PropertyRef Name="IdJugadorAspecto" />
+          </Key>
+          <Property Name="IdJugadorAspecto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdJugador" Type="Int32" />
+          <Property Name="IdAspecto" Type="Int32" />
+          <NavigationProperty Name="Aspectos" Relationship="Self.FK_JugadorAspecto_Aspecto" FromRole="JugadoresAspectos" ToRole="Aspectos" />
+          <NavigationProperty Name="Jugadores" Relationship="Self.FK_JugadorAspecto_Jugador" FromRole="JugadoresAspectos" ToRole="Jugadores" />
+        </EntityType>
+        <EntityType Name="Puntuaciones">
+          <Key>
+            <PropertyRef Name="IdPuntuacion" />
+          </Key>
+          <Property Name="IdPuntuacion" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="casillasRecorridasGlobal" Type="Int32" />
+          <Property Name="monedasObtenidasGlobal" Type="Int32" />
+          <Property Name="partidasGanadasGlobal" Type="Int32" />
+          <Property Name="monedasActuales" Type="Int32" />
+          <Property Name="IdJugador" Type="Int32" />
+          <NavigationProperty Name="Jugadores" Relationship="Self.FK_Jugador_Puntuacion" FromRole="Puntuaciones" ToRole="Jugadores" />
+        </EntityType>
+        <Association Name="FK_Amistades_JugadorReceptor">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1" />
+          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="Amistades">
+              <PropertyRef Name="IdJugadorReceptor" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Amistades_JugadorSolicitante">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="Amistades">
+              <PropertyRef Name="IdJugadorSolicitante" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_FotoPerfil">
+          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Aspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdFotoPerfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_JugadorAspecto_Aspecto">
+          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1" />
+          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Aspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Principal>
+            <Dependent Role="JugadoresAspectos">
+              <PropertyRef Name="IdAspecto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_Cuenta">
+          <End Role="Cuentas" Type="Self.Cuentas" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuentas">
+              <PropertyRef Name="IdCuenta" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Jugador_Puntuacion">
+          <End Role="Puntuaciones" Type="Self.Puntuaciones" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Puntuaciones">
+              <PropertyRef Name="IdPuntuacion" />
+            </Principal>
+            <Dependent Role="Jugadores">
+              <PropertyRef Name="IdPuntuacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_JugadorAspecto_Jugador">
+          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Jugadores">
+              <PropertyRef Name="IdJugador" />
+            </Principal>
+            <Dependent Role="JugadoresAspectos">
+              <PropertyRef Name="IdJugador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="LaOcaBDEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Amistades" EntityType="Self.Amistades" />
+          <EntitySet Name="Aspectos" EntityType="Self.Aspectos" />
+          <EntitySet Name="Cuentas" EntityType="Self.Cuentas" />
+          <EntitySet Name="Jugadores" EntityType="Self.Jugadores" />
+          <EntitySet Name="JugadoresAspectos" EntityType="Self.JugadoresAspectos" />
+          <EntitySet Name="Puntuaciones" EntityType="Self.Puntuaciones" />
+          <AssociationSet Name="FK_Amistades_JugadorReceptor" Association="Self.FK_Amistades_JugadorReceptor">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="Amistades" EntitySet="Amistades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Amistades_JugadorSolicitante" Association="Self.FK_Amistades_JugadorSolicitante">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="Amistades" EntitySet="Amistades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_FotoPerfil" Association="Self.FK_Jugador_FotoPerfil">
+            <End Role="Aspectos" EntitySet="Aspectos" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_JugadorAspecto_Aspecto" Association="Self.FK_JugadorAspecto_Aspecto">
+            <End Role="Aspectos" EntitySet="Aspectos" />
+            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_Cuenta" Association="Self.FK_Jugador_Cuenta">
+            <End Role="Cuentas" EntitySet="Cuentas" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Jugador_Puntuacion" Association="Self.FK_Jugador_Puntuacion">
+            <End Role="Puntuaciones" EntitySet="Puntuaciones" />
+            <End Role="Jugadores" EntitySet="Jugadores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_JugadorAspecto_Jugador" Association="Self.FK_JugadorAspecto_Jugador">
+            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="LaOcaBDModelStoreContainer" CdmEntityContainer="LaOcaBDEntities">
+          <EntitySetMapping Name="Amistades">
+            <EntityTypeMapping TypeName="LaOcaBDModel.Amistades">
+              <MappingFragment StoreEntitySet="Amistades">
+                <ScalarProperty Name="IdAmistad" ColumnName="IdAmistad" />
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="IdJugadorSolicitante" ColumnName="IdJugadorSolicitante" />
+                <ScalarProperty Name="IdJugadorReceptor" ColumnName="IdJugadorReceptor" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Aspectos">
+            <EntityTypeMapping TypeName="LaOcaBDModel.Aspectos">
+              <MappingFragment StoreEntitySet="Aspectos">
+                <ScalarProperty Name="IdAspecto" ColumnName="IdAspecto" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="referencia" ColumnName="referencia" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Cuentas">
+            <EntityTypeMapping TypeName="LaOcaBDModel.Cuentas">
+              <MappingFragment StoreEntitySet="Cuentas">
+                <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+                <ScalarProperty Name="correoElectronico" ColumnName="correoElectronico" />
+                <ScalarProperty Name="contrasena" ColumnName="contrasena" />
+                <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Jugadores">
+            <EntityTypeMapping TypeName="LaOcaBDModel.Jugadores">
+              <MappingFragment StoreEntitySet="Jugadores">
+                <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
+                <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="apellidoPaterno" ColumnName="apellidoPaterno" />
+                <ScalarProperty Name="apellidoMaterno" ColumnName="apellidoMaterno" />
+                <ScalarProperty Name="IdPuntuacion" ColumnName="IdPuntuacion" />
+                <ScalarProperty Name="IdFotoPerfil" ColumnName="IdFotoPerfil" />
+                <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="JugadoresAspectos">
+            <EntityTypeMapping TypeName="LaOcaBDModel.JugadoresAspectos">
+              <MappingFragment StoreEntitySet="JugadoresAspectos">
+                <ScalarProperty Name="IdJugadorAspecto" ColumnName="IdJugadorAspecto" />
+                <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
+                <ScalarProperty Name="IdAspecto" ColumnName="IdAspecto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Puntuaciones">
+            <EntityTypeMapping TypeName="LaOcaBDModel.Puntuaciones">
+              <MappingFragment StoreEntitySet="Puntuaciones">
+                <ScalarProperty Name="IdPuntuacion" ColumnName="IdPuntuacion" />
+                <ScalarProperty Name="casillasRecorridasGlobal" ColumnName="casillasRecorridasGlobal" />
+                <ScalarProperty Name="monedasObtenidasGlobal" ColumnName="monedasObtenidasGlobal" />
+                <ScalarProperty Name="partidasGanadasGlobal" ColumnName="partidasGanadasGlobal" />
+                <ScalarProperty Name="monedasActuales" ColumnName="monedasActuales" />
+                <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

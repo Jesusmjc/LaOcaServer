@@ -3,16 +3,25 @@ using LaOcaService.DAOs.InicioSesion;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
+using System.Data.Entity.Validation;
 using System.Data.SqlClient;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace LaOcaService.DAOs
 {
-    internal class InicioSesionDAO : IInicioSesionDAO
+    public class InicioSesionDAO : IInicioSesionDAO
     {
+        private readonly LaOcaBDEntities contexto;
+
         public InicioSesionDAO() {}
+
+        public InicioSesionDAO(LaOcaBDEntities contexto)
+        {
+            this.contexto = contexto;
+        }
 
         public Jugador IniciarSesion(Cuenta cuentaInicioSesion)
         {
@@ -20,8 +29,8 @@ namespace LaOcaService.DAOs
 
             try
             {
-                using (var contexto = new LaOcaBDEntities())
-                {
+                //using (var contexto = new LaOcaBDEntities())
+                //{
                     var cuentaBD = contexto.Cuentas.Where(cuenta => cuenta.correoElectronico == cuentaInicioSesion.CorreoElectronico
                                                             && cuenta.contrasena == cuentaInicioSesion.Contrasena).FirstOrDefault();
 
@@ -29,38 +38,28 @@ namespace LaOcaService.DAOs
                     {
                         var jugadorBD = contexto.Jugadores.Where(jugador => jugador.IdCuenta == cuentaBD.IdCuenta).FirstOrDefault();
 
-
                         jugadorInicioSesion = new Jugador
                         {
                             IdJugador = jugadorBD.IdJugador,
+                            IdCuenta = (int)jugadorBD.IdCuenta,
                             NombreUsuario = jugadorBD.nombreUsuario,
-                            //Nombre = jugadorBD.nombre,
-                            //ApellidoPaterno = jugadorBD.apellidoPaterno,
-                            //ApellidoMaterno = jugadorBD.apellidoMaterno,
                             //IdPuntuacion = (int)jugadorBD.IdPuntuacion,
                             //IdFotoPerfil = (int)jugadorBD.IdFotoPerfil,
                         };
                     }
-                }
+                //}
             }
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
-                                        | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException)
+                                        | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
+                                        | ex is DbEntityValidationException)
             {
-                Console.WriteLine("Error al iniciar sesión. " + ex.Message + "\n" + ex.InnerException.Message);
-                throw new Exception(ex.Message + "\n" + ex.InnerException.Message + "\n");
+                Console.WriteLine("Error al iniciar sesión. " + ex.Message + "\n" + ex.InnerException.Message); //aquí iría un log
+
+                throw new FaultException<InicioSesionException>(
+                    new InicioSesionException("Ocurrió un error al conectar con la Base de Datos. "),
+                    new FaultReason("Error intenrno del servidor. " + ex.Message + ex.InnerException.Message)
+                );
             }
-            //catch (SqlException ex)
-            //{
-
-            //}
-            //catch (EntityCommandExecutionException ex)
-            //{
-
-            //}
-            //catch (Exception ex)
-            //{
-
-            //}
 
             return jugadorInicioSesion;
         }

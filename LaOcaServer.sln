@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaOcaService", "LaOcaServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaOcaDataAccess", "LaOcaDataAccess\LaOcaDataAccess.csproj", "{44E81760-C364-4F76-870A-1BCC9DDBB13D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaOcaTests", "LaOcaTests\LaOcaTests.csproj", "{117B78F1-B98A-4698-A7AF-ABE2071F4875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{44E81760-C364-4F76-870A-1BCC9DDBB13D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44E81760-C364-4F76-870A-1BCC9DDBB13D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44E81760-C364-4F76-870A-1BCC9DDBB13D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{117B78F1-B98A-4698-A7AF-ABE2071F4875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{117B78F1-B98A-4698-A7AF-ABE2071F4875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{117B78F1-B98A-4698-A7AF-ABE2071F4875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{117B78F1-B98A-4698-A7AF-ABE2071F4875}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

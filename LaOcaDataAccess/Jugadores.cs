@@ -24,9 +24,6 @@ namespace LaOcaDataAccess
     
         public int IdJugador { get; set; }
         public string nombreUsuario { get; set; }
-        public string nombre { get; set; }
-        public string apellidoPaterno { get; set; }
-        public string apellidoMaterno { get; set; }
         public Nullable<int> IdPuntuacion { get; set; }
         public Nullable<int> IdFotoPerfil { get; set; }
         public Nullable<int> IdCuenta { get; set; }

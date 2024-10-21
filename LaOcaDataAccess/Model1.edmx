@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="LaOcaBDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="LaOcaBDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Amistades">
           <Key>
             <PropertyRef Name="IdAmistad" />
@@ -38,9 +38,6 @@
           </Key>
           <Property Name="IdJugador" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="nombreUsuario" Type="nvarchar" MaxLength="40" />
-          <Property Name="nombre" Type="nvarchar" MaxLength="40" />
-          <Property Name="apellidoPaterno" Type="nvarchar" MaxLength="40" />
-          <Property Name="apellidoMaterno" Type="nvarchar" MaxLength="40" />
           <Property Name="IdPuntuacion" Type="int" />
           <Property Name="IdFotoPerfil" Type="int" />
           <Property Name="IdCuenta" Type="int" />
@@ -194,8 +191,7 @@
             <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="LaOcaBDModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -237,9 +233,6 @@
           </Key>
           <Property Name="IdJugador" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="nombreUsuario" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="nombre" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="apellidoPaterno" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="apellidoMaterno" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
           <Property Name="IdPuntuacion" Type="Int32" />
           <Property Name="IdFotoPerfil" Type="Int32" />
           <Property Name="IdCuenta" Type="Int32" />
@@ -443,9 +436,6 @@
               <MappingFragment StoreEntitySet="Jugadores">
                 <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
                 <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
-                <ScalarProperty Name="nombre" ColumnName="nombre" />
-                <ScalarProperty Name="apellidoPaterno" ColumnName="apellidoPaterno" />
-                <ScalarProperty Name="apellidoMaterno" ColumnName="apellidoMaterno" />
                 <ScalarProperty Name="IdPuntuacion" ColumnName="IdPuntuacion" />
                 <ScalarProperty Name="IdFotoPerfil" ColumnName="IdFotoPerfil" />
                 <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />

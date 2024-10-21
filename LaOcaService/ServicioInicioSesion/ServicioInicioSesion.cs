@@ -12,7 +12,7 @@ namespace LaOcaService
     {
         public Jugador IniciarSesion(Cuenta cuentaUsuario)
         {
-            InicioSesionDAO inicioSesionDAO = new InicioSesionDAO();
+            InicioSesionDAO inicioSesionDAO = new InicioSesionDAO(new LaOcaDataAccess.LaOcaBDEntities());
 
             Jugador jugadorInicioSesion = new Jugador();
 
@@ -25,27 +25,6 @@ namespace LaOcaService
                     new FaultReason("Credenciales incorrectas.")
                 );
             }
-
-            //try
-            //{
-            //    jugadorInicioSesion = inicioSesionDAO.IniciarSesion(cuentaUsuario);
-
-            //    if (jugadorInicioSesion.IdJugador == 0)
-            //    {
-            //        throw new FaultException<InicioSesionException>(
-            //            new InicioSesionException()
-            //        );
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    //throw new FaultException<InicioSesionException>(
-            //    //    new InicioSesionException(ex.Message),
-            //    //    new FaultReason("Credenciales incorrectas.")
-            //    //);
-
-            //    Console.WriteLine( ex.ToString() );
-            //}
 
             return jugadorInicioSesion;
         }

@@ -42,15 +42,6 @@ namespace LaOcaService
         public string NombreUsuario { get; set; }
 
         [DataMember]
-        public string Nombre { get; set; }
-
-        [DataMember]
-        public string ApellidoPaterno { get; set; }
-
-        [DataMember]
-        public string ApellidoMaterno { get; set; }
-
-        [DataMember]
         public int IdPuntuacion { get; set; }
 
         [DataMember]
@@ -61,16 +52,6 @@ namespace LaOcaService
     }
 
     [DataContract]
-    //public class InicioSesionException : Exception
-    //{
-    //    public InicioSesionException() : base("No se encontró una cuenta con las credenciales ingresadas.") { }
-
-    //    public InicioSesionException(string mensaje) : base(mensaje) { }
-
-    //    public InicioSesionException(string mensaje, Exception innerException) : base(mensaje, innerException) { }
-
-    //}
-
     public class InicioSesionException
     {
         [DataMember]
@@ -78,7 +59,7 @@ namespace LaOcaService
 
         public InicioSesionException() 
         {
-            Mensaje = "No se ha encontrado una cuenta que concida con las credenciales ingresadas.";
+            Mensaje = "No se ha encontrado una cuenta que coincida con las credenciales ingresadas.";
         }
 
         public InicioSesionException(string mensaje) 

@@ -76,6 +76,8 @@
     <Compile Include="ServicioChat\ServicioChat.cs" />
     <Compile Include="ServicioInicioSesion\IServicioInicioSesion.cs" />
     <Compile Include="ServicioInicioSesion\ServicioInicioSesion.cs" />
+    <Compile Include="ServicioSala\IServicioSala.cs" />
+    <Compile Include="ServicioSala\ServicioSala.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

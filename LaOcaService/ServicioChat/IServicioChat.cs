@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace LaOcaService
 {
     [ServiceContract(CallbackContract = typeof(IChatCallback))]
-    internal interface IServicioChat
+    public interface IServicioChat
     {
         [OperationContract(IsOneWay = true)]
-        void UnirseAlChat(string nombreJugador);
+        void UnirseAlChat(string nombreJugador, string codigoSala);
 
 
         [OperationContract(IsOneWay = true)]
-        void EnviarMensaje(string nombreJugador, string mensaje);
+        void EnviarMensaje(string nombreJugador, string mensaje, string codigoSala);
     }
 
     public interface IChatCallback

@@ -13,28 +13,27 @@ namespace LaOcaService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class LaOcaService : IServicioChat
     {
-        private readonly Dictionary<string, IChatCallback> _clientes = new Dictionary<string, IChatCallback>();
+        //private readonly Dictionary<string, IChatCallback> clientes = new Dictionary<string, IChatCallback>();
         
-        public void UnirseAlChat(string nombreJugador)
+        public void UnirseAlChat(string nombreJugador, string codigoSala)
         {
-            IChatCallback callback = OperationContext.Current.GetCallbackChannel<IChatCallback>();
+            //IChatCallback callback = OperationContext.Current.GetCallbackChannel<IChatCallback>();
 
-            if (!_clientes.ContainsKey(nombreJugador))
+            if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
             {
-                _clientes.Add(nombreJugador, callback);
-                Console.WriteLine(nombreJugador + " se ha unido al chat.");
+                listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
             }
 
-            EnviarMensaje(nombreJugador, " se ha unido al chat");
+            EnviarMensaje(nombreJugador, "se ha unido al chat", codigoSala);
         }
 
-        public void EnviarMensaje(string nombreJugador, string mensaje)
+        public void EnviarMensaje(string nombreJugador, string mensaje, string codigoSala)
         {
-            foreach (var cliente in _clientes.Values)
+            foreach (var cliente in listaSalasActivas[codigoSala].Jugadores)
             {
                 try
                 {
-                    cliente.MostrarMensaje(nombreJugador, mensaje);
+                    cliente.Value.CanalCallbackChat.MostrarMensaje(nombreJugador, mensaje);
                 }
                 catch (CommunicationException ex)
                 {

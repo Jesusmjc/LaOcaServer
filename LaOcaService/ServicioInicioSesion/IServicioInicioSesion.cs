@@ -49,6 +49,13 @@ namespace LaOcaService
 
         [DataMember]
         public int IdCuenta { get; set; }
+
+        [DataMember]
+        public IChatCallback CanalCallbackChat {  get; set; }
+
+        [DataMember]
+        public ISalaCallback CanalCallbackSala { get; set; }
+
     }
 
     [DataContract]

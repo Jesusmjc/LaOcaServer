@@ -69,6 +69,12 @@
   <ItemGroup>
     <Compile Include="DAOs\InicioSesion\IInicioSesionDAO.cs" />
     <Compile Include="DAOs\InicioSesion\InicioSesionDAO.cs" />
+    <Compile Include="DAOs\AspectoFolder\AspectoDAO.cs" />
+    <Compile Include="DAOs\AspectoFolder\IAspectoDAO.cs" />
+    <Compile Include="DAOs\CuentaFolder\CuentaDAO.cs" />
+    <Compile Include="DAOs\CuentaFolder\ICuentaDAO.cs" />
+    <Compile Include="DAOs\JugadorFolder\IJugadorDAO.cs" />
+    <Compile Include="DAOs\JugadorFolder\JugadorDAO.cs" />
     <Compile Include="LoginService\ILoginService.cs" />
     <Compile Include="LoginService\LoginService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +84,8 @@
     <Compile Include="ServicioInicioSesion\ServicioInicioSesion.cs" />
     <Compile Include="ServicioSala\IServicioSala.cs" />
     <Compile Include="ServicioSala\ServicioSala.cs" />
+    <Compile Include="ServicioCuenta\IServicioCuenta.cs" />
+    <Compile Include="ServicioCuenta\ServicioCuenta.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -93,6 +101,10 @@
     <Analyzer Include="..\packages\xunit.analyzers.1.16.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
     <Analyzer Include="..\packages\xunit.analyzers.1.16.0\analyzers\dotnet\cs\xunit.analyzers.fixes.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == '' and '$(VisualStudioVersion)' != '' and '$(VisualStudioVersion)' != '11.0'">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

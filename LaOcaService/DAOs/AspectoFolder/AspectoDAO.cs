@@ -16,9 +16,9 @@ namespace LaOcaService.DAOs.AspectoFolder
             {
                 var aspectoBD = new Aspectos
                 {
-                    idAspecto = aspecto.idAspecto,
-                    tipo = aspecto.tipo,
-                    referencia = aspecto.referencia
+                    IdAspecto = aspecto.IdAspecto,
+                    tipo = aspecto.Tipo,
+                    referencia = aspecto.Referencia
                 };
                 contexto.Aspectos.Add(aspectoBD);
                 contexto.SaveChanges();
@@ -29,20 +29,20 @@ namespace LaOcaService.DAOs.AspectoFolder
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                var aspectoBD = contexto.Aspectos.FirstOrDefault(a => a.idAspecto == idAspecto);
+                var aspectoBD = contexto.Aspectos.FirstOrDefault(a => a.IdAspecto == idAspecto);
                 if (aspectoBD == null)
                 {
                     Console.WriteLine($"Aspecto con ID {idAspecto} no encontrado.");
                     return null;
                 }
 
-                Console.WriteLine($"Aspecto encontrado: ID = {aspectoBD.idAspecto}, Referencia = {aspectoBD.referencia}, Tipo = {aspectoBD.tipo}");
+                Console.WriteLine($"Aspecto encontrado: ID = {aspectoBD.IdAspecto}, Referencia = {aspectoBD.referencia}, Tipo = {aspectoBD.tipo}");
 
                 return new Aspecto
                 {
-                    idAspecto = aspectoBD.idAspecto,
-                    referencia = aspectoBD.referencia,
-                    tipo = aspectoBD.tipo
+                    IdAspecto = aspectoBD.IdAspecto,
+                    Referencia = aspectoBD.referencia,
+                    Tipo = aspectoBD.tipo
                 };
             }
         }
@@ -51,14 +51,14 @@ namespace LaOcaService.DAOs.AspectoFolder
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                var aspectoBD = contexto.Aspectos.Find(aspecto.idAspecto);
+                var aspectoBD = contexto.Aspectos.Find(aspecto.IdAspecto);
                 if (aspectoBD == null)
                 {
                     return;
                 }
 
-                aspectoBD.referencia = aspecto.referencia;
-                aspectoBD.tipo = aspecto.tipo;
+                aspectoBD.referencia = aspecto.Referencia;
+                aspectoBD.tipo = aspecto.Tipo;
                 contexto.SaveChanges();
             }
         }

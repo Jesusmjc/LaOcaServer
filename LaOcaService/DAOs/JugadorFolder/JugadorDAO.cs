@@ -15,18 +15,18 @@ namespace LaOcaService.DAOs.JugadorFolder
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                var cuentaExistente = contexto.Cuentas.Find(jugador.idCuenta);
+                var cuentaExistente = contexto.Cuentas.Find(jugador.IdCuenta);
                 if (cuentaExistente == null)
                 {
-                    throw new Exception($"La cuenta con id {jugador.idCuenta} no existe.");
+                    throw new Exception($"La cuenta con id {jugador.IdCuenta} no existe.");
                 }
 
-                var aspectoExistente = contexto.Aspectos.Find(jugador.idFotoPerfil);
+                var aspectoExistente = contexto.Aspectos.Find(jugador.IdFotoPerfil);
                 if (aspectoExistente == null)
                 {
                     var nuevoAspecto = new Aspectos
                     {
-                        idAspecto = jugador.idFotoPerfil,
+                        IdAspecto = jugador.IdFotoPerfil,
                         tipo = "Foto de perfil",
                         referencia = referenciaImagen
                     };
@@ -37,7 +37,7 @@ namespace LaOcaService.DAOs.JugadorFolder
                     aspectoExistente = nuevoAspecto;
                 }
 
-                var puntuacionExistente = contexto.Puntuaciones.Find(jugador.idPuntuacion);
+                var puntuacionExistente = contexto.Puntuaciones.Find(jugador.IdPuntuacion);
                 if (puntuacionExistente == null)
                 {
                     var nuevaPuntuacion = new Puntuaciones
@@ -54,19 +54,19 @@ namespace LaOcaService.DAOs.JugadorFolder
 
                 var jugadorBD = new Jugadores
                 {
-                    nombreUsuario = jugador.nombreUsuario,
-                    idFotoPerfil = aspectoExistente.idAspecto,
-                    idCuenta = cuentaExistente.idCuenta,
-                    idPuntuacion = puntuacionExistente.IdPuntuacion
+                    nombreUsuario = jugador.NombreUsuario,
+                    IdFotoPerfil = aspectoExistente.IdAspecto,
+                    IdCuenta = cuentaExistente.IdCuenta,
+                    IdPuntuacion = puntuacionExistente.IdPuntuacion
                 };
 
                 contexto.Jugadores.Add(jugadorBD);
                 contexto.SaveChanges();
-                cuentaExistente.idJugador = jugadorBD.idJugador;
+                cuentaExistente.IdJugador = jugadorBD.IdJugador;
                 contexto.SaveChanges();
-                puntuacionExistente.IdJugador = jugadorBD.idJugador;
+                puntuacionExistente.IdJugador = jugadorBD.IdJugador;
                 contexto.SaveChanges();
-                Console.WriteLine($"Jugador creado con id: {jugadorBD.idJugador}, idFotoPerfil: {jugadorBD.idFotoPerfil}, idCuenta: {jugadorBD.idCuenta}, idPuntuacion: {jugadorBD.idPuntuacion}");
+                Console.WriteLine($"Jugador creado con id: {jugadorBD.IdJugador}, idFotoPerfil: {jugadorBD.IdFotoPerfil}, idCuenta: {jugadorBD.IdCuenta}, idPuntuacion: {jugadorBD.IdPuntuacion}");
             }
         }
 
@@ -74,14 +74,14 @@ namespace LaOcaService.DAOs.JugadorFolder
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                var jugadorBD = contexto.Jugadores.Find(jugador.idJugador);
+                var jugadorBD = contexto.Jugadores.Find(jugador.IdJugador);
                 if (jugadorBD == null)
                 {
                     return;
                 }
 
-                jugadorBD.nombreUsuario = jugador.nombreUsuario;
-                jugadorBD.idFotoPerfil = jugador.idFotoPerfil;
+                jugadorBD.nombreUsuario = jugador.NombreUsuario;
+                jugadorBD.IdFotoPerfil = jugador.IdFotoPerfil;
                 contexto.SaveChanges();
             }
         }
@@ -95,11 +95,11 @@ namespace LaOcaService.DAOs.JugadorFolder
 
                 return new Jugador
                 {
-                    idJugador = jugadorBD.idJugador,
-                    nombreUsuario = jugadorBD.nombreUsuario,
-                    idFotoPerfil = (int)jugadorBD.idFotoPerfil,
-                    idPuntuacion = (int)jugadorBD.idPuntuacion,
-                    idCuenta = (int)jugadorBD.idCuenta
+                    IdJugador = jugadorBD.IdJugador,
+                    NombreUsuario = jugadorBD.nombreUsuario,
+                    IdFotoPerfil = (int)jugadorBD.IdFotoPerfil,
+                    IdPuntuacion = (int)jugadorBD.IdPuntuacion,
+                    IdCuenta = (int)jugadorBD.IdCuenta
                 };
             }
         }

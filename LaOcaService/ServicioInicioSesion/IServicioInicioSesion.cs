@@ -17,48 +17,6 @@ namespace LaOcaService
     }
 
     [DataContract]
-    public class Cuenta
-    {
-        [DataMember]
-        public int IdCuenta { get; set; }
-
-        [DataMember]
-        public string CorreoElectronico { get; set; }
-
-        [DataMember]
-        public string Contrasena { get; set; }
-
-        [DataMember]
-        public int IdJugador { get; set; }
-    }
-
-    [DataContract]
-    public class Jugador
-    {
-        [DataMember]
-        public int IdJugador { get; set; }
-
-        [DataMember]
-        public string NombreUsuario { get; set; }
-
-        [DataMember]
-        public int IdPuntuacion { get; set; }
-
-        [DataMember]
-        public int IdFotoPerfil { get; set; }
-
-        [DataMember]
-        public int IdCuenta { get; set; }
-
-        [DataMember]
-        public IChatCallback CanalCallbackChat {  get; set; }
-
-        [DataMember]
-        public ISalaCallback CanalCallbackSala { get; set; }
-
-    }
-
-    [DataContract]
     public class InicioSesionException
     {
         [DataMember]

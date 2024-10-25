@@ -61,38 +61,44 @@ namespace LaOcaService
     public class Cuenta
     {
         [DataMember]
-        public int idCuenta { get; set; }
+        public int IdCuenta { get; set; }
         [DataMember]
-        public string correoElectronico { get; set; }
+        public string CorreoElectronico { get; set; }
         [DataMember]
-        public string contrasena { get; set; }
+        public string Contrasena { get; set; }
         [DataMember]
-        public int idJugador { get; set; }
+        public int IdJugador { get; set; }
     }
 
     [DataContract]
     public class Jugador
     {
         [DataMember]
-        public int idJugador { get; set; }
+        public int IdJugador { get; set; }
         [DataMember]
-        public string nombreUsuario { get; set; }
+        public string NombreUsuario { get; set; }
         [DataMember]
-        public int idFotoPerfil { get; set; }
+        public int IdFotoPerfil { get; set; }
         [DataMember]
-        public int idPuntuacion { get; set; }
+        public int IdPuntuacion { get; set; }
         [DataMember]
-        public int idCuenta { get; set; }
+        public int IdCuenta { get; set; }
+
+        [DataMember]
+        public IChatCallback CanalCallbackChat { get; set; }
+
+        [DataMember]
+        public ISalaCallback CanalCallbackSala { get; set; }
     }
 
     [DataContract]
     public class Aspecto
     {
         [DataMember]
-        public int idAspecto { get; set; }
+        public int IdAspecto { get; set; }
         [DataMember]
-        public string tipo { get; set; }
+        public string Tipo { get; set; }
         [DataMember]
-        public string referencia { get; set; }
+        public string Referencia { get; set; }
     }
 }

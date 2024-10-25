@@ -40,7 +40,7 @@ namespace LaOcaService
         public void CrearCuenta(Cuenta cuenta, Jugador jugador, string referenciaImagen)
         {
             _cuentaDAO.CrearCuenta(cuenta);
-            jugador.idCuenta = cuenta.idCuenta;
+            jugador.IdCuenta = cuenta.IdCuenta;
             _jugadorDAO.CrearJugador(jugador, referenciaImagen);
         }
 
@@ -124,7 +124,7 @@ namespace LaOcaService
                 if (cuenta != null)
                 {
                     _codigosVerificacion.Remove(correo);
-                    return cuenta.idCuenta;
+                    return cuenta.IdCuenta;
                 }
             }
             return -1;

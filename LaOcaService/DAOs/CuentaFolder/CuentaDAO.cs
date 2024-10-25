@@ -17,15 +17,15 @@ namespace LaOcaService.DAOs
             {
                 var cuentaBD = new Cuentas
                 {
-                    correoElectronico = cuenta.correoElectronico,
-                    contrasena = cuenta.contrasena,
-                    idJugador = cuenta.idJugador
+                    correoElectronico = cuenta.CorreoElectronico,
+                    contrasena = cuenta.Contrasena,
+                    IdJugador = cuenta.IdJugador
                 };
                 contexto.Cuentas.Add(cuentaBD);
                 contexto.SaveChanges();
 
                 // Asignar el idCuenta generado a la cuenta original
-                cuenta.idCuenta = cuentaBD.idCuenta;
+                cuenta.IdCuenta = cuentaBD.IdCuenta;
             }
         }
 
@@ -33,14 +33,14 @@ namespace LaOcaService.DAOs
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                var cuentaBD = contexto.Cuentas.Find(cuenta.idCuenta);
+                var cuentaBD = contexto.Cuentas.Find(cuenta.IdCuenta);
                 if (cuentaBD == null)
                 {
                     return;
                 }
 
-                cuentaBD.correoElectronico = cuenta.correoElectronico;
-                cuentaBD.contrasena = cuenta.contrasena;
+                cuentaBD.correoElectronico = cuenta.CorreoElectronico;
+                cuentaBD.contrasena = cuenta.Contrasena;
                 contexto.SaveChanges();
             }
         }
@@ -58,10 +58,10 @@ namespace LaOcaService.DAOs
 
                 return new Cuenta
                 {
-                    idCuenta = cuentaBD.idCuenta,
-                    correoElectronico = cuentaBD.correoElectronico,
-                    contrasena = cuentaBD.contrasena,
-                    idJugador = (int)cuentaBD.idJugador
+                    IdCuenta = cuentaBD.IdCuenta,
+                    CorreoElectronico = cuentaBD.correoElectronico,
+                    Contrasena = cuentaBD.contrasena,
+                    IdJugador = (int)cuentaBD.IdJugador
                 };
             }
         }
@@ -80,10 +80,10 @@ namespace LaOcaService.DAOs
                 // Retornar un objeto Cuenta con los datos encontrados
                 return new Cuenta
                 {
-                    idCuenta = cuentaBD.idCuenta,
-                    correoElectronico = cuentaBD.correoElectronico,
-                    contrasena = cuentaBD.contrasena,
-                    idJugador = (int)cuentaBD.idJugador
+                    IdCuenta = cuentaBD.IdCuenta,
+                    CorreoElectronico = cuentaBD.correoElectronico,
+                    Contrasena = cuentaBD.contrasena,
+                    IdJugador = (int)cuentaBD.IdJugador
                 };
             }
         }

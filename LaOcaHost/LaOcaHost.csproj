@@ -65,6 +65,10 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LaOcaDataAccess\LaOcaDataAccess.csproj">
+      <Project>{44e81760-c364-4f76-870a-1bcc9ddbb13d}</Project>
+      <Name>LaOcaDataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LaOcaService\LaOcaService.csproj">
       <Project>{0fcc0477-3a05-4d2f-8526-33252f12d2d0}</Project>
       <Name>LaOcaService</Name>

@@ -8,7 +8,7 @@ using LaOcaService.DAOs.CuentaFolder;
 
 namespace LaOcaService.DAOs
 {
-    internal class CuentaDAO : ICuentaDAO
+    public class CuentaDAO : ICuentaDAO
     {
         public CuentaDAO() { }
         public void CrearCuenta(Cuenta cuenta)
@@ -24,7 +24,6 @@ namespace LaOcaService.DAOs
                 contexto.Cuentas.Add(cuentaBD);
                 contexto.SaveChanges();
 
-                // Asignar el idCuenta generado a la cuenta original
                 cuenta.IdCuenta = cuentaBD.IdCuenta;
             }
         }
@@ -36,7 +35,7 @@ namespace LaOcaService.DAOs
                 var cuentaBD = contexto.Cuentas.Find(cuenta.IdCuenta);
                 if (cuentaBD == null)
                 {
-                    return;
+                    throw new KeyNotFoundException($"Cuenta con ID {cuenta.IdCuenta} no encontrada.");
                 }
 
                 cuentaBD.correoElectronico = cuenta.CorreoElectronico;
@@ -44,7 +43,6 @@ namespace LaOcaService.DAOs
                 contexto.SaveChanges();
             }
         }
-
 
         public Cuenta ObtenerCuentaPorId(int idCuenta)
         {
@@ -70,14 +68,12 @@ namespace LaOcaService.DAOs
         {
             using (var contexto = new LaOcaBDEntities())
             {
-                // Realizar la consulta a la base de datos buscando por correo electrónico
                 var cuentaBD = contexto.Cuentas.FirstOrDefault(c => c.correoElectronico == correoElectronico);
                 if (cuentaBD == null)
                 {
                     return null;
                 }
 
-                // Retornar un objeto Cuenta con los datos encontrados
                 return new Cuenta
                 {
                     IdCuenta = cuentaBD.IdCuenta,
@@ -85,6 +81,14 @@ namespace LaOcaService.DAOs
                     Contrasena = cuentaBD.contrasena,
                     IdJugador = (int)cuentaBD.IdJugador
                 };
+            }
+        }
+
+        public bool CorreoExiste(string correoElectronico)
+        {
+            using (var contexto = new LaOcaBDEntities())
+            {
+                return contexto.Cuentas.Any(c => c.correoElectronico == correoElectronico);
             }
         }
 

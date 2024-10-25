@@ -8,7 +8,7 @@ using LaOcaDataAccess;
 
 namespace LaOcaService.DAOs.JugadorFolder
 {
-    internal class JugadorDAO : IJugadorDAO
+    public class JugadorDAO : IJugadorDAO
     {
         public JugadorDAO() {}
         public void CrearJugador(Jugador jugador, string referenciaImagen)
@@ -18,7 +18,7 @@ namespace LaOcaService.DAOs.JugadorFolder
                 var cuentaExistente = contexto.Cuentas.Find(jugador.IdCuenta);
                 if (cuentaExistente == null)
                 {
-                    throw new Exception($"La cuenta con id {jugador.IdCuenta} no existe.");
+                    throw new KeyNotFoundException($"La cuenta con id {jugador.IdCuenta} no existe.");
                 }
 
                 var aspectoExistente = contexto.Aspectos.Find(jugador.IdFotoPerfil);
@@ -30,7 +30,6 @@ namespace LaOcaService.DAOs.JugadorFolder
                         tipo = "FotoPerfil",
                         referencia = referenciaImagen
                     };
-                    
 
                     contexto.Aspectos.Add(nuevoAspecto);
                     contexto.SaveChanges();
@@ -103,5 +102,14 @@ namespace LaOcaService.DAOs.JugadorFolder
                 };
             }
         }
+
+        public bool NombreUsuarioExiste(string nombreUsuario)
+        {
+            using (var contexto = new LaOcaBDEntities())
+            {
+                return contexto.Jugadores.Any(j => j.nombreUsuario == nombreUsuario);
+            }
+        }
+
     }
 }

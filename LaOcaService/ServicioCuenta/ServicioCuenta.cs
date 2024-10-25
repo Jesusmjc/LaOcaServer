@@ -23,7 +23,7 @@ namespace LaOcaService
 
         private readonly Dictionary<string, string> _codigosVerificacion = new Dictionary<string, string>();
 
-        public LaOcaService() 
+        public LaOcaService()
         {
             _cuentaDAO = new CuentaDAO();
             _jugadorDAO = new JugadorDAO();
@@ -68,7 +68,7 @@ namespace LaOcaService
         {
             return _jugadorDAO.ObtenerJugadorPorId(idJugador);
         }
-        
+
         public void CrearAspecto(Aspecto aspecto)
         {
             _aspectoDAO.CrearAspecto(aspecto);
@@ -84,7 +84,7 @@ namespace LaOcaService
             string codigoVerificacion = GenerarCodigoVerificacion();
             _codigosVerificacion[correoElectronico] = codigoVerificacion;
 
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587) 
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
             {
                 Credentials = new NetworkCredential("OcaGameService@gmail.com", "kaerrnwxqnjmbvgg"),
                 EnableSsl = true
@@ -104,9 +104,17 @@ namespace LaOcaService
                 smtpClient.Send(mensaje);
                 Console.WriteLine("Correo enviado exitosamente.");
             }
-            catch (Exception ex)
+            catch (SmtpException ex)
             {
                 Console.WriteLine($"Error al enviar el correo: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Error de operación inválida: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado: {ex.Message}");
             }
         }
 
@@ -155,7 +163,7 @@ namespace LaOcaService
 
             if (cuenta == null)
             {
-                throw new Exception("No se encontró una cuenta con ese correo electrónico.");
+                throw new KeyNotFoundException("No se encontró una cuenta con ese correo electrónico.");
             }
             EnviarCodigoVerificacion(correoElectronico);
         }
@@ -167,7 +175,7 @@ namespace LaOcaService
                 var cuenta = contexto.Cuentas.Find(idCuenta);
                 if (cuenta == null)
                 {
-                    throw new Exception("No se encontró la cuenta especificada.");
+                    throw new KeyNotFoundException("No se encontró la cuenta especificada.");
                 }
 
                 cuenta.contrasena = nuevaContrasena;
@@ -192,5 +200,16 @@ namespace LaOcaService
             }
             return cuenta;
         }
+
+        public bool CorreoExiste(string correoElectronico)
+        {
+            return _cuentaDAO.CorreoExiste(correoElectronico);
+        }
+
+        public bool NombreUsuarioExiste(string nombreUsuario)
+        {
+            return _jugadorDAO.NombreUsuarioExiste(nombreUsuario);
+        }
+
     }
 }

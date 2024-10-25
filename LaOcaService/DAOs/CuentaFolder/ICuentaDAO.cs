@@ -12,5 +12,6 @@ namespace LaOcaService.DAOs.CuentaFolder
         Cuenta ObtenerCuentaPorId(int idCuenta);
         void ModificarCuenta(Cuenta cuenta);
         Cuenta ObtenerCuentaPorCorreo(string correoElectronico);
+        bool CorreoExiste(string correoElectronico);
     }
 }

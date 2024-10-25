@@ -11,5 +11,6 @@ namespace LaOcaService.DAOs.JugadorFolder
         void CrearJugador(Jugador jugador, string referenciaImagen);
         Jugador ObtenerJugadorPorId(int idJugador);
         void ModificarJugador(Jugador jugador);
+        bool NombreUsuarioExiste(string nombreUsuario);
     }
 }

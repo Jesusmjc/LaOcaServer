@@ -55,6 +55,12 @@ namespace LaOcaService
 
         [OperationContract]
         Cuenta ObtenerCuentaPorCodigoVerificacion(string codigoVerificacion);
+
+        [OperationContract]
+        bool CorreoExiste(string correoElectronico);
+
+        [OperationContract]
+        bool NombreUsuarioExiste(string nombreUsuario);
     }
 
     [DataContract]

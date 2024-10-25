@@ -7,7 +7,7 @@ using LaOcaDataAccess;
 
 namespace LaOcaService.DAOs.AspectoFolder
 {
-    internal class AspectoDAO : IAspectoDAO
+    public class AspectoDAO : IAspectoDAO
     {
         public AspectoDAO() {}
         public void CrearAspecto(Aspecto aspecto)
@@ -32,8 +32,7 @@ namespace LaOcaService.DAOs.AspectoFolder
                 var aspectoBD = contexto.Aspectos.FirstOrDefault(a => a.IdAspecto == idAspecto);
                 if (aspectoBD == null)
                 {
-                    Console.WriteLine($"Aspecto con ID {idAspecto} no encontrado.");
-                    return null;
+                    throw new KeyNotFoundException($"Aspecto con ID {idAspecto} no encontrado.");
                 }
 
                 Console.WriteLine($"Aspecto encontrado: ID = {aspectoBD.IdAspecto}, Referencia = {aspectoBD.referencia}, Tipo = {aspectoBD.tipo}");

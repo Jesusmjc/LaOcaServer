@@ -36,7 +36,7 @@ namespace LaOcaService
 
             return esCodigoUnico;
         }
-
+  
         public int AgregarJugadorASala(Jugador nuevoJugador, string codigoSala)
         {
             int resultado = 0;
@@ -57,6 +57,40 @@ namespace LaOcaService
             }
             return resultado;
         }
+
+        public Partida IniciarPartida(string codigoSala)
+        {
+            List<string> ordenDeTurnos = DecidirOrdenDeTurnos(listaSalasActivas[codigoSala]);
+            Partida nuevaPartida = new Partida()
+            {
+                NombresDeJugadoresEnOrdenDeTurnos = ordenDeTurnos,
+                NombreJugadorEnTurno = ordenDeTurnos[0]
+            };
+
+            if (listaSalasActivas.ContainsKey(codigoSala))
+            {
+                listaSalasActivas[codigoSala].Partida = nuevaPartida;
+
+                foreach (var parJugador in listaSalasActivas[codigoSala].Jugadores)
+                {
+                    if (!parJugador.Key.Equals(listaSalasActivas[codigoSala].NombreHost))
+                    {
+                        parJugador.Value.CanalCallbackSala.MostrarVentanaDePartida(nuevaPartida);
+                    }
+                }
+            }
+
+            return nuevaPartida;
+        }
+
+        private List<string> DecidirOrdenDeTurnos(Sala sala)
+        {
+            Random random = new Random();
+
+            List<string> nombresDeJugadoresEnOrdenDeTurnos = sala.Jugadores.Keys.OrderBy(key => random.Next()).ToList();
+
+            return nombresDeJugadoresEnOrdenDeTurnos;
+        }
     }
 
     public partial class LaOcaService : IServicioRecuperarSala
@@ -71,6 +105,41 @@ namespace LaOcaService
             }
 
             return sala;
+        }
+    }
+
+    public partial class LaOcaService : IServicioPartida
+    {
+        public void AgregarCanalCallback(string nombreJugador, string codigoSala)
+        {
+            if (listaSalasActivas.ContainsKey(codigoSala))
+            {
+                if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
+                {
+                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackPartida = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
+                }
+            }
+        }
+
+        public string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala)
+        {
+            Sala sala = listaSalasActivas[codigoSala];
+
+            string nombreJugadorActual = (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual]);
+
+            int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
+            string nombreSiguienteJugador = (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador]);
+            sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
+
+            foreach (var parJugador in sala.Jugadores)
+            {
+                if (!parJugador.Key.Equals(nombreJugadorActual))
+                {
+                    parJugador.Value.CanalCallbackPartida.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
+                }
+            }
+
+            return nombreSiguienteJugador;
         }
     }
 }

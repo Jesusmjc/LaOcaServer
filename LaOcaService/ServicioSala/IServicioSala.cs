@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ServiceModel;
 using System.Runtime.Serialization;
 using LaOcaDataAccess;
+using System.CodeDom;
 
 
 namespace LaOcaService
@@ -21,6 +22,9 @@ namespace LaOcaService
 
         [OperationContract]
         int AgregarJugadorASala(Jugador nuevoJugador, string codigoSala);
+
+        [OperationContract]
+        Partida IniciarPartida(string codigoSala);
     }
 
     [ServiceContract]
@@ -34,7 +38,27 @@ namespace LaOcaService
     {
         [OperationContract(IsOneWay = true)]
         void MostrarNuevoJugadorEnSala(Jugador nuevoJugador);
+
+        [OperationContract(IsOneWay = true)]
+        void MostrarVentanaDePartida(Partida partida);
     }
+
+    [ServiceContract(CallbackContract = typeof(IPartidaCallback))]
+    public interface IServicioPartida
+    {
+        [OperationContract]
+        void AgregarCanalCallback(string nombreJugador, string codigoSala);
+
+        [OperationContract]
+        string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala);
+    }
+
+    public interface IPartidaCallback
+    {
+        [OperationContract(IsOneWay = true)]
+        void MostrarNuevoJugadorEnTurno(string nombreNuevoJugadorEnTurno);
+    }
+
 
     [DataContract]
     public class Sala
@@ -49,12 +73,25 @@ namespace LaOcaService
         public string Nombre;
 
         [DataMember]
-        public string TipoDeAcceso;
+        public string Visibilidad;
 
         [DataMember]
         public string NombreHost;
 
         [DataMember]
         public Dictionary<string, Jugador> Jugadores;
+
+        [DataMember]
+        public Partida Partida;
+    }
+
+    [DataContract]
+    public class Partida
+    {
+        [DataMember]
+        public string NombreJugadorEnTurno;
+
+        [DataMember]
+        public List<string> NombresDeJugadoresEnOrdenDeTurnos;
     }
 }

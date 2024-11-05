@@ -74,6 +74,23 @@ namespace LaOcaService
         public string Contrasena { get; set; }
         [DataMember]
         public int IdJugador { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null | GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Cuenta cuenta = (Cuenta)obj;
+
+            return IdCuenta == cuenta.IdCuenta && CorreoElectronico == cuenta.CorreoElectronico;
+        }
+
+        public override int GetHashCode()
+        {
+            return (IdCuenta, CorreoElectronico).GetHashCode();
+        }
     }
 
     [DataContract]
@@ -95,6 +112,30 @@ namespace LaOcaService
 
         [DataMember]
         public ISalaCallback CanalCallbackSala { get; set; }
+
+        [DataMember]
+        public IPartidaCallback CanalCallbackPartida { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Jugador jugador = (Jugador)obj;
+
+            return IdJugador == jugador.IdJugador && 
+                   NombreUsuario == jugador.NombreUsuario &&
+                   IdFotoPerfil == jugador.IdFotoPerfil &&
+                   IdPuntuacion == jugador.IdPuntuacion &&
+                   IdCuenta == jugador.IdCuenta;
+        }
+
+        public override int GetHashCode()
+        {
+            return (IdJugador, NombreUsuario).GetHashCode();
+        }
     }
 
     [DataContract]

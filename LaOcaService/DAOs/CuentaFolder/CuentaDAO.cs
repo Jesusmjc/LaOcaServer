@@ -10,7 +10,11 @@ namespace LaOcaService.DAOs
 {
     public class CuentaDAO : ICuentaDAO
     {
-        public CuentaDAO() { }
+        //private readonly LaOcaBDEntities contexto;
+        public CuentaDAO()
+        {
+
+        }
         public void CrearCuenta(Cuenta cuenta)
         {
             using (var contexto = new LaOcaBDEntities())

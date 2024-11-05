@@ -87,6 +87,8 @@
     <Compile Include="ServicioChat\ServicioChat.cs" />
     <Compile Include="ServicioInicioSesion\IServicioInicioSesion.cs" />
     <Compile Include="ServicioInicioSesion\ServicioInicioSesion.cs" />
+    <Compile Include="ServicioJugabilidad\IServicioJugabilidad.cs" />
+    <Compile Include="ServicioJugabilidad\ServicioJugabilidad.cs" />
     <Compile Include="ServicioSala\IServicioSala.cs" />
     <Compile Include="ServicioSala\ServicioSala.cs" />
     <Compile Include="ServicioCuenta\IServicioCuenta.cs" />

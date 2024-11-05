@@ -28,6 +28,8 @@ namespace LaOcaService
             _cuentaDAO = new CuentaDAO();
             _jugadorDAO = new JugadorDAO();
             _aspectoDAO = new AspectoDAO();
+
+            InicializarJuego(); // Este método es de ServicioJugabilidad.cs
         }
 
         public LaOcaService(ICuentaDAO cuentaDAO, IJugadorDAO jugadorDAO, IAspectoDAO aspectoDAO)

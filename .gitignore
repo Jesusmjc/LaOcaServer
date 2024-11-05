@@ -361,5 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
 LaOcaHost/App.config
-LaOcaHost/App.config
+LaOcaService/App.config
+LaOcaTests/App.config
+LaOcaDataAccess/App.config

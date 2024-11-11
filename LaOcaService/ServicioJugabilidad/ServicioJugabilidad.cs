@@ -56,7 +56,14 @@ namespace LaOcaService
         public void JugarTurno(int pasos)
         {
             Mover(_juego.Ficha, pasos, _juego.Tablero.Casillas);
+
+            // Callback para actualizar a todos los jugadores con la posición de la ficha
+            foreach (var jugador in listaSalasActivas.Values.SelectMany(sala => sala.Jugadores.Values))
+            {
+                jugador.CanalCallbackPartida.ActualizarPosicionFicha(_juego.Ficha.PosicionActual, jugador.NombreUsuario);
+            }
         }
+
 
         public int ObtenerPosicionFicha()
         {

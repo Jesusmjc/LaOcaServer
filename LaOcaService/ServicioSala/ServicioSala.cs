@@ -10,6 +10,15 @@ namespace LaOcaService
     public partial class LaOcaService : IServicioSala
     {
         public static Dictionary<string, Sala> listaSalasActivas = new Dictionary<string, Sala>();
+        // Diccionario para asignar fichas a cada jugador en la sala
+        private static readonly Dictionary<int, string> fichaPorPosicion = new Dictionary<int, string>
+        {
+            { 0, "FichaOcaAmarilla" },
+            { 1, "FichaOcaAzul" },
+            { 2, "FichaOcaRosa" },
+            { 3, "FichaOcaVerde" }
+        };
+
 
         public int AgregarNuevaSala(Sala nuevaSala)
         {
@@ -36,27 +45,36 @@ namespace LaOcaService
 
             return esCodigoUnico;
         }
-  
+
         public int AgregarJugadorASala(Jugador nuevoJugador, string codigoSala)
         {
             int resultado = 0;
             if (listaSalasActivas.ContainsKey(codigoSala))
             {
-                if (!listaSalasActivas[codigoSala].Jugadores.ContainsKey(nuevoJugador.NombreUsuario) && listaSalasActivas[codigoSala].Jugadores.Count <= 3)
+                Sala sala = listaSalasActivas[codigoSala];
+
+                // Verifica que no haya más de 4 jugadores en la sala
+                if (!sala.Jugadores.ContainsKey(nuevoJugador.NombreUsuario) && sala.Jugadores.Count < 4)
                 {
-                    foreach (var jugador in listaSalasActivas[codigoSala].Jugadores)
+                    int posicionJugador = sala.Jugadores.Count;
+
+                    // Asigna una ficha según la posición en la sala
+                    nuevoJugador.FichaAsignada = fichaPorPosicion.ContainsKey(posicionJugador) ? fichaPorPosicion[posicionJugador] : "FichaOcaAmarilla";
+
+                    foreach (var jugador in sala.Jugadores)
                     {
                         jugador.Value.CanalCallbackSala.MostrarNuevoJugadorEnSala(nuevoJugador);
                     }
 
                     nuevoJugador.CanalCallbackSala = OperationContext.Current.GetCallbackChannel<ISalaCallback>();
-                    listaSalasActivas[codigoSala].Jugadores.Add(nuevoJugador.NombreUsuario, nuevoJugador);
+                    sala.Jugadores.Add(nuevoJugador.NombreUsuario, nuevoJugador);
 
                     resultado = 1;
                 }
             }
             return resultado;
         }
+
 
         public Partida IniciarPartida(string codigoSala)
         {
@@ -123,23 +141,41 @@ namespace LaOcaService
 
         public string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala)
         {
-            Sala sala = listaSalasActivas[codigoSala];
-
-            string nombreJugadorActual = (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual]);
-
-            int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
-            string nombreSiguienteJugador = (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador]);
-            sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
-
-            foreach (var parJugador in sala.Jugadores)
+            // Bloquear el acceso al método para asegurar que un solo hilo cambia el turno
+            lock (listaSalasActivas)
             {
-                if (!parJugador.Key.Equals(nombreJugadorActual))
+                if (!listaSalasActivas.ContainsKey(codigoSala))
                 {
-                    parJugador.Value.CanalCallbackPartida.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
+                    throw new ArgumentException("Código de sala no válido.");
                 }
-            }
 
-            return nombreSiguienteJugador;
+                Sala sala = listaSalasActivas[codigoSala];
+                string nombreJugadorActual = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual];
+
+                // Calcular la posición del siguiente jugador
+                int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
+                string nombreSiguienteJugador = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador];
+                sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
+
+                // Notificar de forma asincrónica a todos los jugadores sobre el nuevo turno
+                foreach (var parJugador in sala.Jugadores)
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            parJugador.Value.CanalCallbackPartida.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error al notificar al jugador {parJugador.Key}: {ex.Message}");
+                        }
+                    });
+                }
+
+                return nombreSiguienteJugador;
+            }
         }
+
     }
 }

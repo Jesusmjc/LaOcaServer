@@ -108,6 +108,8 @@ namespace LaOcaService
         public int IdCuenta { get; set; }
 
         [DataMember]
+        public Ficha Ficha { get; set; }
+        [DataMember]
         public IChatCallback CanalCallbackChat { get; set; }
 
         [DataMember]
@@ -115,6 +117,10 @@ namespace LaOcaService
 
         [DataMember]
         public IPartidaCallback CanalCallbackPartida { get; set; }
+
+        [DataMember]
+        public string FichaAsignada { get; set; }
+
 
         public override bool Equals(object obj)
         {

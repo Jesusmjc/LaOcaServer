@@ -57,6 +57,10 @@ namespace LaOcaService
     {
         [OperationContract(IsOneWay = true)]
         void MostrarNuevoJugadorEnTurno(string nombreNuevoJugadorEnTurno);
+
+        [OperationContract(IsOneWay = true)]
+        void ActualizarPosicionFicha(int nuevaPosicion, string nombreJugador);
+
     }
 
 

@@ -108,6 +108,9 @@ namespace LaOcaService
         public int IdCuenta { get; set; }
 
         [DataMember]
+        public  List<InvitacionPartida> Invitaciones { get; set; }
+
+        [DataMember]
         public IChatCallback CanalCallbackChat { get; set; }
 
         [DataMember]
@@ -115,6 +118,17 @@ namespace LaOcaService
 
         [DataMember]
         public IPartidaCallback CanalCallbackPartida { get; set; }
+
+        [DataMember]
+        public IJugadoresEnLineaCallback CanalCallbackJugadoresEnLinea { get; set; }
+
+        [DataMember]
+        public IBuzonCallback CanalCallbackBuzon { get; set; }
+
+        public Jugador()
+        {
+            Invitaciones = new List<InvitacionPartida>();
+        }
 
         public override bool Equals(object obj)
         {

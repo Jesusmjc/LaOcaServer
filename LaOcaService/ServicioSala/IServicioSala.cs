@@ -25,12 +25,19 @@ namespace LaOcaService
 
         [OperationContract]
         Partida IniciarPartida(string codigoSala);
+
+        [OperationContract]
+        void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala);
+
+        [OperationContract]
+        void EliminarSala(string codigoSala);
     }
 
     [ServiceContract]
     public interface IServicioRecuperarSala
     {
         [OperationContract]
+        [FaultContract(typeof(SalaException))]
         Sala RecuperarSala(string codigoSala);
     }
 
@@ -41,13 +48,19 @@ namespace LaOcaService
 
         [OperationContract(IsOneWay = true)]
         void MostrarVentanaDePartida(Partida partida);
+
+        [OperationContract(IsOneWay = true)]
+        void MostrarDesconexionJugador(string nombreJugador);
+
+        [OperationContract(IsOneWay = true)]
+        void ExpulsarAMenúPrincipal(string motivo);
     }
 
     [ServiceContract(CallbackContract = typeof(IPartidaCallback))]
     public interface IServicioPartida
     {
         [OperationContract]
-        void AgregarCanalCallback(string nombreJugador, string codigoSala);
+        void AgregarCanalCallbackPartida(string nombreJugador, string codigoSala);
 
         [OperationContract]
         string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala);
@@ -83,6 +96,28 @@ namespace LaOcaService
 
         [DataMember]
         public Partida Partida;
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Sala sala = (Sala)obj;
+
+            return IdSala == sala.IdSala &&
+                   Codigo == sala.Codigo &&
+                   Nombre == sala.Nombre &&
+                   Visibilidad == sala.Visibilidad &&
+                   NombreHost == sala.NombreHost;
+        }
+
+        public override int GetHashCode()
+        {
+            return (IdSala, Codigo, Nombre, Visibilidad, NombreHost).GetHashCode();
+        }
     }
 
     [DataContract]
@@ -93,5 +128,22 @@ namespace LaOcaService
 
         [DataMember]
         public List<string> NombresDeJugadoresEnOrdenDeTurnos;
+    }
+
+    [DataContract]
+    public class SalaException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public SalaException()
+        {
+            Mensaje = "Ha ocurrido un error al procesar la solicitud de la sala.";
+        }
+
+        public SalaException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
     }
 }

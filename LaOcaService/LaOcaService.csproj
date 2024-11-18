@@ -89,10 +89,14 @@
     <Compile Include="ServicioInicioSesion\ServicioInicioSesion.cs" />
     <Compile Include="ServicioJugabilidad\IServicioJugabilidad.cs" />
     <Compile Include="ServicioJugabilidad\ServicioJugabilidad.cs" />
+    <Compile Include="ServicioJugadoresEnLinea\IServicioJugadoresEnLinea.cs" />
+    <Compile Include="ServicioJugadoresEnLinea\ServicioJugadoresEnLinea.cs" />
     <Compile Include="ServicioSala\IServicioSala.cs" />
     <Compile Include="ServicioSala\ServicioSala.cs" />
     <Compile Include="ServicioCuenta\IServicioCuenta.cs" />
     <Compile Include="ServicioCuenta\ServicioCuenta.cs" />
+    <Compile Include="ServicioSocial\IServicioSocial.cs" />
+    <Compile Include="ServicioSocial\ServicioSocial.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

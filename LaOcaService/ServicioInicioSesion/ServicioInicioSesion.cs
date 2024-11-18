@@ -14,15 +14,21 @@ namespace LaOcaService
         {
             InicioSesionDAO inicioSesionDAO = new InicioSesionDAO(new LaOcaDataAccess.LaOcaBDEntities());
 
-            Jugador jugadorInicioSesion = new Jugador();
-
-            jugadorInicioSesion = inicioSesionDAO.IniciarSesion(cuentaUsuario);
+            Jugador jugadorInicioSesion = inicioSesionDAO.IniciarSesion(cuentaUsuario);
 
             if (jugadorInicioSesion.IdJugador == 0)
             {
                 throw new FaultException<InicioSesionException>(
                     new InicioSesionException(),
                     new FaultReason("Credenciales incorrectas.")
+                );
+            }
+
+            if (listaJugadoresConectados.ContainsKey(jugadorInicioSesion.NombreUsuario))
+            {
+                throw new FaultException<InicioSesionException>(
+                    new InicioSesionException("No puedes iniciar otra sesión."),
+                    new FaultReason("Parece que ya iniciaste sesión desde otro dispositivo. Si no eres tú, por favor contacta a nuestro equipo de desarrollo.")
                 );
             }
 

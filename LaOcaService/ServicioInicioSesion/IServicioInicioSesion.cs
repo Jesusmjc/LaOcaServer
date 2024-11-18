@@ -13,7 +13,7 @@ namespace LaOcaService
     {
         [OperationContract]
         [FaultContract(typeof(InicioSesionException))]
-        Jugador IniciarSesion(Cuenta cuentaUsuario);    
+        Jugador IniciarSesion(Cuenta cuentaUsuario);
     }
 
     [DataContract]

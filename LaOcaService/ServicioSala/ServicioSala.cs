@@ -91,6 +91,32 @@ namespace LaOcaService
 
             return nombresDeJugadoresEnOrdenDeTurnos;
         }
+
+        public void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala)
+        {
+            Sala salaObjetivo = listaSalasActivas[codigoSala];
+            salaObjetivo.Jugadores.Remove(nombreJugadorDesconectado);
+
+            foreach (var parJugador in salaObjetivo.Jugadores)
+            {
+                parJugador.Value.CanalCallbackSala.MostrarDesconexionJugador(nombreJugadorDesconectado);
+            }
+        }
+
+        public void EliminarSala(string codigoSala)
+        {
+            Sala salaObjetivo = listaSalasActivas[codigoSala];
+
+            foreach (var parJugador in salaObjetivo.Jugadores)
+            {
+                if (!parJugador.Value.NombreUsuario.Equals(salaObjetivo.NombreHost))
+                {
+                    parJugador.Value.CanalCallbackSala.ExpulsarAMenúPrincipal("El anfitrión ha abandonado la sala. Regresarás al Menú Principal.");
+                }
+            }
+
+            listaSalasActivas.Remove(codigoSala);
+        }
     }
 
     public partial class LaOcaService : IServicioRecuperarSala
@@ -104,13 +130,21 @@ namespace LaOcaService
                 sala = listaSalasActivas[codigoSala];
             }
 
+            if (sala.Codigo != codigoSala)
+            {
+                throw new FaultException<SalaException>(
+                    new SalaException("No existe una sala con ese código."),
+                    new FaultReason("No se encontró la sala.")
+                );
+            }
+
             return sala;
         }
     }
 
     public partial class LaOcaService : IServicioPartida
     {
-        public void AgregarCanalCallback(string nombreJugador, string codigoSala)
+        public void AgregarCanalCallbackPartida(string nombreJugador, string codigoSala)
         {
             if (listaSalasActivas.ContainsKey(codigoSala))
             {

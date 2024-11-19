@@ -53,6 +53,7 @@ namespace LaOcaService
         string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala);
     }
 
+
     public interface IPartidaCallback
     {
         [OperationContract(IsOneWay = true)]
@@ -60,7 +61,6 @@ namespace LaOcaService
 
         [OperationContract(IsOneWay = true)]
         void ActualizarPosicionFicha(int nuevaPosicion, string nombreJugador);
-
     }
 
 

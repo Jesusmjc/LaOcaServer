@@ -93,6 +93,7 @@
     <Compile Include="ServicioSala\ServicioSala.cs" />
     <Compile Include="ServicioCuenta\IServicioCuenta.cs" />
     <Compile Include="ServicioCuenta\ServicioCuenta.cs" />
+    <Compile Include="Utilidades\Utilidades.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

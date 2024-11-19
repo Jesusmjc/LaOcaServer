@@ -10,7 +10,6 @@ namespace LaOcaService
     public partial class LaOcaService : IServicioSala
     {
         public static Dictionary<string, Sala> listaSalasActivas = new Dictionary<string, Sala>();
-        // Diccionario para asignar fichas a cada jugador en la sala
         private static readonly Dictionary<int, string> fichaPorPosicion = new Dictionary<int, string>
         {
             { 0, "FichaOcaAmarilla" },
@@ -18,7 +17,6 @@ namespace LaOcaService
             { 2, "FichaOcaRosa" },
             { 3, "FichaOcaVerde" }
         };
-
 
         public int AgregarNuevaSala(Sala nuevaSala)
         {
@@ -53,12 +51,10 @@ namespace LaOcaService
             {
                 Sala sala = listaSalasActivas[codigoSala];
 
-                // Verifica que no haya más de 4 jugadores en la sala
                 if (!sala.Jugadores.ContainsKey(nuevoJugador.NombreUsuario) && sala.Jugadores.Count < 4)
                 {
                     int posicionJugador = sala.Jugadores.Count;
 
-                    // Asigna una ficha según la posición en la sala
                     nuevoJugador.FichaAsignada = fichaPorPosicion.ContainsKey(posicionJugador) ? fichaPorPosicion[posicionJugador] : "FichaOcaAmarilla";
 
                     foreach (var jugador in sala.Jugadores)
@@ -141,7 +137,6 @@ namespace LaOcaService
 
         public string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala)
         {
-            // Bloquear el acceso al método para asegurar que un solo hilo cambia el turno
             lock (listaSalasActivas)
             {
                 if (!listaSalasActivas.ContainsKey(codigoSala))
@@ -152,12 +147,10 @@ namespace LaOcaService
                 Sala sala = listaSalasActivas[codigoSala];
                 string nombreJugadorActual = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual];
 
-                // Calcular la posición del siguiente jugador
                 int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
                 string nombreSiguienteJugador = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador];
                 sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
 
-                // Notificar de forma asincrónica a todos los jugadores sobre el nuevo turno
                 foreach (var parJugador in sala.Jugadores)
                 {
                     Task.Run(() =>
@@ -176,6 +169,5 @@ namespace LaOcaService
                 return nombreSiguienteJugador;
             }
         }
-
     }
 }

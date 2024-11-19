@@ -41,6 +41,13 @@ namespace LaOcaService
         Sala RecuperarSala(string codigoSala);
     }
 
+    [ServiceContract]
+    public interface IServicioExpulsionSala
+    {
+        [OperationContract]
+        void ExpulsarJugador(string codigoSala, string nombreJugador);
+    }
+
     public interface ISalaCallback
     {
         [OperationContract(IsOneWay = true)]
@@ -71,6 +78,25 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void MostrarNuevoJugadorEnTurno(string nombreNuevoJugadorEnTurno);
     }
+
+    //[ServiceContract]
+    //public interface IServicioActualizacionSalaYPartida
+    //{
+    //    [OperationContract]
+    //    void AgregarCanalCallbackActualizacionSalaPartida(string nombreJugador, string codigoSala);
+
+    //    [OperationContract]
+    //    void ExpulsarJugador(string codigoSala, string nombreJugador);
+    //}
+
+    //public interface IActualizacionSalaYPartidaCallback
+    //{
+    //    [OperationContract(IsOneWay = true)]
+    //    void MostrarDesconexionJugador(string nombreJugador);
+
+    //    [OperationContract(IsOneWay = true)]
+    //    void ExpulsarAMenúPrincipal(string motivo);
+    //}
 
 
     [DataContract]

@@ -72,6 +72,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DAOs\AmistadFolder\AmistadDAO.cs" />
+    <Compile Include="DAOs\AmistadFolder\IAmistadDAO.cs" />
     <Compile Include="DAOs\InicioSesion\IInicioSesionDAO.cs" />
     <Compile Include="DAOs\InicioSesion\InicioSesionDAO.cs" />
     <Compile Include="DAOs\AspectoFolder\AspectoDAO.cs" />

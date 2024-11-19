@@ -12,13 +12,13 @@ namespace LaOcaTests.InicioSesionDAO
 {
     public class TestInicioSesionDAOExcepcion
     {
-        private readonly LaOcaBDEntities contexto;
-        private LaOcaService.DAOs.InicioSesionDAO inicioSesionDAO;
+        private readonly LaOcaBDEntities _contexto;
+        private LaOcaService.DAOs.InicioSesionDAO _inicioSesionDAO;
 
         public TestInicioSesionDAOExcepcion()
         {
-            contexto = new LaOcaBDEntities();
-            inicioSesionDAO = new LaOcaService.DAOs.InicioSesionDAO(contexto);
+            _contexto = new LaOcaBDEntities();
+            _inicioSesionDAO = new LaOcaService.DAOs.InicioSesionDAO(_contexto);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace LaOcaTests.InicioSesionDAO
             };
 
             var excepcion = Assert.Throws<FaultException<InicioSesionException>>(
-                () => inicioSesionDAO.IniciarSesion(cuentaQueSiExiste));
+                () => _inicioSesionDAO.IniciarSesion(cuentaQueSiExiste));
 
             Assert.Equal("Ocurrió un error al conectar con la Base de Datos. ", excepcion.Detail.Mensaje);
         }

@@ -97,6 +97,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmistadDAO\TestAmistadDAO.cs" />
+    <Compile Include="AmistadDAO\TestAmistadDAOExcepcion.cs" />
     <Compile Include="AspectoDAO\AspectoDAOTest.cs" />
     <Compile Include="CuentaDAO\CuentaDAOTest.cs" />
     <Compile Include="InicioSesionDAO\TestInicioSesionDAO.cs" />

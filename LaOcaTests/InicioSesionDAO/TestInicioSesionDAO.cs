@@ -10,20 +10,20 @@ namespace LaOcaTests.InicioSesionDAO
 {
     public class TestInicioSesionDAO : IDisposable
     {
-        private readonly LaOcaBDEntities contexto;
-        private DbContextTransaction transaccion;
+        private readonly LaOcaBDEntities _contexto;
+        private DbContextTransaction _transaccion;
 
-        private LaOcaService.DAOs.InicioSesionDAO inicioSesionDAO;
-        private int idCuentaPrueba;
-        private int idFotoPerfilPrueba;
-        private int idPuntuacionPrueba;
-        private int idJugadorPrueba;
+        private LaOcaService.DAOs.InicioSesionDAO _inicioSesionDAO;
+        private int _idCuentaPrueba;
+        private int _idFotoPerfilPrueba;
+        private int _idPuntuacionPrueba;
+        private int _idJugadorPrueba;
 
         public TestInicioSesionDAO()
         {
-            contexto = new LaOcaBDEntities();
-            transaccion = contexto.Database.BeginTransaction();
-            inicioSesionDAO = new LaOcaService.DAOs.InicioSesionDAO(contexto);
+            _contexto = new LaOcaBDEntities();
+            _transaccion = _contexto.Database.BeginTransaction();
+            _inicioSesionDAO = new LaOcaService.DAOs.InicioSesionDAO(_contexto);
 
             PrepararBaseDeDatos();
         }
@@ -31,36 +31,36 @@ namespace LaOcaTests.InicioSesionDAO
         private void PrepararBaseDeDatos()
         {
             Aspectos fotoPerfil = new Aspectos();
-            contexto.Aspectos.Add(fotoPerfil);
-            contexto.SaveChanges();
+            _contexto.Aspectos.Add(fotoPerfil);
+            _contexto.SaveChanges();
 
             Puntuaciones puntuaciones = new Puntuaciones();
-            contexto.Puntuaciones.Add(puntuaciones);
-            contexto.SaveChanges();
+            _contexto.Puntuaciones.Add(puntuaciones);
+            _contexto.SaveChanges();
 
             Cuentas cuentaDePrueba = new Cuentas()
             {
                 correoElectronico = "correoejemplo@gmail.com",
                 contrasena = "96c63e8bf0a1abe4539fd3b6dcd269bfcd27929a4d6a28bcf82195feae5b3324", // Ej3mpl0_Contra53ñ4
             };
-            contexto.Cuentas.Add(cuentaDePrueba);
-            contexto.SaveChanges();
+            _contexto.Cuentas.Add(cuentaDePrueba);
+            _contexto.SaveChanges();
 
-            idFotoPerfilPrueba = fotoPerfil.IdAspecto;
-            idPuntuacionPrueba = puntuaciones.IdPuntuacion;
-            idCuentaPrueba = cuentaDePrueba.IdCuenta;
+            _idFotoPerfilPrueba = fotoPerfil.IdAspecto;
+            _idPuntuacionPrueba = puntuaciones.IdPuntuacion;
+            _idCuentaPrueba = cuentaDePrueba.IdCuenta;
 
             Jugadores jugadorPrueba = new Jugadores()
             {
-                IdCuenta = idCuentaPrueba,
+                IdCuenta = _idCuentaPrueba,
                 nombreUsuario = "jugadorDePrueba3928",
-                IdFotoPerfil = idFotoPerfilPrueba,
-                IdPuntuacion = idPuntuacionPrueba
+                IdFotoPerfil = _idFotoPerfilPrueba,
+                IdPuntuacion = _idPuntuacionPrueba
             };
-            contexto.Jugadores.Add(jugadorPrueba);
-            contexto.SaveChanges();
+            _contexto.Jugadores.Add(jugadorPrueba);
+            _contexto.SaveChanges();
 
-            idJugadorPrueba = jugadorPrueba.IdJugador;
+            _idJugadorPrueba = jugadorPrueba.IdJugador;
         }
 
         [Fact]
@@ -68,11 +68,11 @@ namespace LaOcaTests.InicioSesionDAO
         {
             var jugadorEsperado = new Jugador
             {
-                IdJugador = idJugadorPrueba,
-                IdCuenta = idCuentaPrueba,
+                IdJugador = _idJugadorPrueba,
+                IdCuenta = _idCuentaPrueba,
                 NombreUsuario = "jugadorDePrueba3928",
-                IdFotoPerfil = idFotoPerfilPrueba,
-                IdPuntuacion = idPuntuacionPrueba
+                IdFotoPerfil = _idFotoPerfilPrueba,
+                IdPuntuacion = _idPuntuacionPrueba
             };
 
             var cuentaQueSiExiste = new Cuenta
@@ -81,7 +81,7 @@ namespace LaOcaTests.InicioSesionDAO
                 Contrasena = "96c63e8bf0a1abe4539fd3b6dcd269bfcd27929a4d6a28bcf82195feae5b3324" // Ej3mpl0_Contra53ñ4
             };
 
-            Jugador jugador = inicioSesionDAO.IniciarSesion(cuentaQueSiExiste);
+            Jugador jugador = _inicioSesionDAO.IniciarSesion(cuentaQueSiExiste);
 
             Assert.True(jugadorEsperado.Equals(jugador));
         }
@@ -97,16 +97,16 @@ namespace LaOcaTests.InicioSesionDAO
                 Contrasena = "96c63e8bf0a1abe4539fd3b6dcd269bfcd27929a4d6a28bcf82195feae5b3324" // Ej3mpl0_Contra53ñ4
             };
 
-            Jugador jugador = inicioSesionDAO.IniciarSesion(cuentaQueNoExiste);
+            Jugador jugador = _inicioSesionDAO.IniciarSesion(cuentaQueNoExiste);
 
             Assert.True(jugadorEsperado.Equals(jugador));
         }
 
         public void Dispose()
         {
-            transaccion.Rollback();
-            transaccion.Dispose();
-            contexto.Dispose();
+            _transaccion.Rollback();
+            _transaccion.Dispose();
+            _contexto.Dispose();
         }
     }
 }

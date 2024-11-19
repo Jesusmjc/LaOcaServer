@@ -142,6 +142,21 @@ namespace LaOcaService
         }
     }
 
+    public partial class LaOcaService : IServicioExpulsionSala
+    {
+        public void ExpulsarJugador(string codigoSala, string nombreJugador)
+        {
+            listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
+            listaSalasActivas[codigoSala].Jugadores.Remove(nombreJugador);
+
+            foreach (var parJugador in listaSalasActivas[codigoSala].Jugadores)
+            {
+
+                parJugador.Value.CanalCallbackSala?.MostrarDesconexionJugador(parJugador.Key);
+            }
+        }
+    }
+
     public partial class LaOcaService : IServicioPartida
     {
         public void AgregarCanalCallbackPartida(string nombreJugador, string codigoSala)

@@ -99,6 +99,7 @@
     <Compile Include="ServicioCuenta\ServicioCuenta.cs" />
     <Compile Include="ServicioSocial\IServicioSocial.cs" />
     <Compile Include="ServicioSocial\ServicioSocial.cs" />
+    <Compile Include="Utilidades\Utilidades.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

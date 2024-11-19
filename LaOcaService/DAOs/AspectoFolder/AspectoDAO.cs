@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,13 @@ namespace LaOcaService.DAOs.AspectoFolder
 {
     public class AspectoDAO : IAspectoDAO
     {
+        //private readonly LaOcaBDEntities contexto;
         public AspectoDAO() {}
+        /*public AspectoDAO(LaOcaBDEntities contexto)
+        {
+            this.contexto = contexto;
+        }*/
+
         public void CrearAspecto(Aspecto aspecto)
         {
             using (var contexto = new LaOcaBDEntities())
@@ -48,18 +55,32 @@ namespace LaOcaService.DAOs.AspectoFolder
 
         public void ModificarAspecto(Aspecto aspecto)
         {
-            using (var contexto = new LaOcaBDEntities())
+            try
             {
-                var aspectoBD = contexto.Aspectos.Find(aspecto.IdAspecto);
-                if (aspectoBD == null)
+                using (var contexto = new LaOcaBDEntities())
                 {
-                    return;
-                }
+                    var aspectoBD = contexto.Aspectos.Find(aspecto.IdAspecto);
+                    if (aspectoBD == null)
+                    {
+                        throw new KeyNotFoundException($"Aspecto con ID {aspecto.IdAspecto} no encontrado.");
+                    }
 
-                aspectoBD.referencia = aspecto.Referencia;
-                aspectoBD.tipo = aspecto.Tipo;
-                contexto.SaveChanges();
+                    aspectoBD.referencia = aspecto.Referencia;
+                    aspectoBD.tipo = aspecto.Tipo;
+                    contexto.SaveChanges();
+                }
+            }
+            catch (DbEntityValidationException ex)
+            {
+                foreach (var validationErrors in ex.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        Console.WriteLine($"Property: {validationError.PropertyName}, Error: {validationError.ErrorMessage}");
+                    }
+                }
             }
         }
+
     }
 }

@@ -1,48 +1,126 @@
-﻿using Xunit;
-using LaOcaService.DAOs;
-using Moq;
+﻿using System;
+using System.Linq;
+using Xunit;
 using LaOcaDataAccess;
-using System.Collections.Generic;
+using LaOcaService.DAOs;
+using LaOcaService.DAOs.CuentaFolder;
 using LaOcaService;
 
-public class CuentaDAOTests
+public class TestCuentaDAO : IDisposable
 {
-    [Fact]
-    public void ObtenerCuentaPorId_CuentaExiste_RetornaCuenta()
+    private readonly LaOcaBDEntities contexto;
+    private readonly CuentaDAO cuentaDAO;
+    private int idCuentaPrueba;
+
+    public TestCuentaDAO()
     {
-        var mockContext = new Mock<LaOcaBDEntities>();
-        var cuentaDAO = new CuentaDAO();
-        var cuenta = new Cuentas { IdCuenta = 1, correoElectronico = "test@example.com", contrasena = "password", IdJugador = 1 };
-        mockContext.Setup(m => m.Cuentas.Find(1)).Returns(cuenta);
+        contexto = new LaOcaBDEntities();
+        cuentaDAO = new CuentaDAO();
+        PrepararBaseDeDatos();
+    }
 
-        var result = cuentaDAO.ObtenerCuentaPorId(1);
-
-        Assert.NotNull(result);
-        Assert.Equal(1, result.IdCuenta);
-        Assert.Equal("test@example.com", result.CorreoElectronico);
+    private void PrepararBaseDeDatos()
+    {
+        var cuenta = new Cuentas
+        {
+            correoElectronico = "prueba@correo.com",
+            contrasena = "contrasenaPrueba",
+            IdJugador = 1
+        };
+        contexto.Cuentas.Add(cuenta);
+        contexto.SaveChanges();
+        idCuentaPrueba = cuenta.IdCuenta;
     }
 
     [Fact]
-    public void ObtenerCuentaPorId_CuentaNoExiste_RetornaNull()
+    public void PruebaCrearCuenta()
     {
-        var mockContext = new Mock<LaOcaBDEntities>();
-        var cuentaDAO = new CuentaDAO();
-        mockContext.Setup(m => m.Cuentas.Find(1)).Returns((Cuentas)null);
+        var nuevaCuenta = new Cuenta
+        {
+            CorreoElectronico = "nuevo@correo.com",
+            Contrasena = "nuevaContrasena",
+            IdJugador = 2
+        };
 
-        var result = cuentaDAO.ObtenerCuentaPorId(1);
+        cuentaDAO.CrearCuenta(nuevaCuenta);
 
-        Assert.Null(result);
+        var cuentaBD = contexto.Cuentas.Find(nuevaCuenta.IdCuenta);
+        Assert.NotNull(cuentaBD);
+        Assert.Equal("nuevo@correo.com", cuentaBD.correoElectronico);
     }
 
     [Fact]
-    public void ModificarCuenta_CuentaNoExiste_LanzaExcepcion()
+    public void PruebaModificarCuenta()
     {
-        var mockContext = new Mock<LaOcaBDEntities>();
-        var cuentaDAO = new CuentaDAO();
-        var cuenta = new Cuenta { IdCuenta = 1, CorreoElectronico = "test@example.com", Contrasena = "password", IdJugador = 1 };
-        mockContext.Setup(m => m.Cuentas.Find(1)).Returns((Cuentas)null);
+        var cuenta = new Cuenta
+        {
+            IdCuenta = idCuentaPrueba,
+            CorreoElectronico = "modificado@correo.com",
+            Contrasena = "contrasenaModificada"
+        };
 
-        var exception = Assert.Throws<KeyNotFoundException>(() => cuentaDAO.ModificarCuenta(cuenta));
-        Assert.Equal("Cuenta con ID 1 no encontrada.", exception.Message);
+        cuentaDAO.ModificarCuenta(cuenta);
+
+        using (var contexto = new LaOcaBDEntities())
+        {
+            var cuentaBD = contexto.Cuentas.Find(idCuentaPrueba);
+
+            Assert.Equal("modificado@correo.com", cuentaBD.correoElectronico);
+            Assert.Equal("contrasenaModificada", cuentaBD.contrasena);
+        }
+    }
+
+    [Fact]
+    public void PruebaObtenerCuentaPorId()
+    {
+        var cuenta = cuentaDAO.ObtenerCuentaPorId(idCuentaPrueba);
+        Assert.NotNull(cuenta);
+        Assert.Equal("prueba@correo.com", cuenta.CorreoElectronico);
+    }
+
+    [Fact]
+    public void PruebaObtenerCuentaPorCorreo()
+    {
+        using (var contexto = new LaOcaBDEntities())
+        {
+            var cuentasExistentes = contexto.Cuentas.Where(c => c.correoElectronico == "prueba@correo.com");
+            contexto.Cuentas.RemoveRange(cuentasExistentes);
+            contexto.SaveChanges();
+        }
+
+        int cuentaId;
+        using (var contexto = new LaOcaBDEntities())
+        {
+            var cuenta = new Cuentas
+            {
+                correoElectronico = "prueba@correo.com",
+                contrasena = "contrasenaPrueba",
+                IdJugador = 1
+            };
+            contexto.Cuentas.Add(cuenta);
+            contexto.SaveChanges();
+
+            cuentaId = cuenta.IdCuenta;
+        }
+
+        var cuentaObtenida = cuentaDAO.ObtenerCuentaPorCorreo("prueba@correo.com");
+
+        Assert.NotNull(cuentaObtenida); 
+        Assert.Equal("prueba@correo.com", cuentaObtenida.CorreoElectronico); 
+        Assert.Equal(cuentaId, cuentaObtenida.IdCuenta); 
+
+        Console.WriteLine($"Cuenta obtenida: IdCuenta = {cuentaObtenida.IdCuenta}, Correo = {cuentaObtenida.CorreoElectronico}");
+    }
+
+    [Fact]
+    public void PruebaCorreoExiste()
+    {
+        var existe = cuentaDAO.CorreoExiste("prueba@correo.com");
+        Assert.True(existe);
+    }
+
+    public void Dispose()
+    {
+        contexto.Dispose();
     }
 }

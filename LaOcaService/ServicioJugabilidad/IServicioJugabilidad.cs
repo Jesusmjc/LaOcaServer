@@ -12,7 +12,7 @@ namespace LaOcaService
     public interface IServicioJugabilidad
     {
         [OperationContract]
-        void JugarTurno(int pasos);
+        void JugarTurno(int pasos, string codigoSala, string nombreJugador);
 
         [OperationContract]
         int ObtenerPosicionFicha();
@@ -43,7 +43,6 @@ namespace LaOcaService
     {
         [DataMember]
         public int PosicionActual { get; set; }
-        public int TurnosPerdidos { get; set; }
 
         public Ficha()
         {

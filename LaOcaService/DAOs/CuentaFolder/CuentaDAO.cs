@@ -11,10 +11,12 @@ namespace LaOcaService.DAOs
     public class CuentaDAO : ICuentaDAO
     {
         //private readonly LaOcaBDEntities contexto;
-        public CuentaDAO()
+        public CuentaDAO() {}
+        /*public CuentaDAO(LaOcaBDEntities contexto)
         {
+            this.contexto = contexto;
+        }*/
 
-        }
         public void CrearCuenta(Cuenta cuenta)
         {
             using (var contexto = new LaOcaBDEntities())
@@ -75,7 +77,12 @@ namespace LaOcaService.DAOs
                 var cuentaBD = contexto.Cuentas.FirstOrDefault(c => c.correoElectronico == correoElectronico);
                 if (cuentaBD == null)
                 {
-                    return null;
+                    throw new KeyNotFoundException($"Cuenta con correo {correoElectronico} no encontrada.");
+                }
+
+                if (cuentaBD.IdJugador == null)
+                {
+                    throw new InvalidOperationException("La cuenta no tiene un jugador asociado.");
                 }
 
                 return new Cuenta
@@ -83,7 +90,7 @@ namespace LaOcaService.DAOs
                     IdCuenta = cuentaBD.IdCuenta,
                     CorreoElectronico = cuentaBD.correoElectronico,
                     Contrasena = cuentaBD.contrasena,
-                    IdJugador = (int)cuentaBD.IdJugador
+                    IdJugador = cuentaBD.IdJugador.Value // Asegurar que no sea nulo
                 };
             }
         }

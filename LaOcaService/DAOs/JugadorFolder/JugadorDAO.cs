@@ -10,7 +10,13 @@ namespace LaOcaService.DAOs.JugadorFolder
 {
     public class JugadorDAO : IJugadorDAO
     {
+        //private readonly LaOcaBDEntities contexto;
         public JugadorDAO() {}
+        /*public JugadorDAO(LaOcaBDEntities contexto)
+        {
+            this.contexto = contexto;
+        }*/
+
         public void CrearJugador(Jugador jugador, string referenciaImagen)
         {
             using (var contexto = new LaOcaBDEntities())

@@ -1,0 +1,4 @@
+﻿C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaHost\Program.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaHost\Properties\AssemblyInfo.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaHost\App.config
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaHost\packages.config

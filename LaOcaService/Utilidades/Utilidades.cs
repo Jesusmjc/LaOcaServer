@@ -54,7 +54,7 @@ namespace LaOcaService
 
         public int ObtenerSiguienteOca(int posicionActual)
         {
-            int[] casillasOca = { 1, 5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59, 63 };
+            int[] casillasOca = { 1, 5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59};
             foreach (int casilla in casillasOca)
             {
                 if (casilla > posicionActual)

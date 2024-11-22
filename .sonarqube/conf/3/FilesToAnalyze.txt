@@ -1,0 +1,14 @@
+﻿C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\AmistadDAO\TestAmistadDAO.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\AmistadDAO\TestAmistadDAOExcepcion.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\AspectoDAO\AspectoDAOTest.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\CuentaDAO\CuentaDAOTest.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\InicioSesionDAO\TestInicioSesionDAO.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\InicioSesionDAO\TestInicioSesionDAOExcepcion.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\JugadorDAO\JugadorDAOTest.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\Properties\AssemblyInfo.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\packages\xunit.runner.visualstudio.2.8.2\build\net462\xunit.runner.visualstudio.testadapter.dll
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\packages\xunit.runner.visualstudio.2.8.2\build\net462\xunit.abstractions.dll
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\packages\xunit.runner.visualstudio.2.8.2\build\net462\xunit.runner.reporters.net452.dll
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\packages\xunit.runner.visualstudio.2.8.2\build\net462\xunit.runner.utility.net452.dll
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\App.config
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaTests\packages.config

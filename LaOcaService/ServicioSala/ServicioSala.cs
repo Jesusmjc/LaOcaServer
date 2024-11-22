@@ -173,6 +173,27 @@ namespace LaOcaService
 
     public partial class LaOcaService : IServicioPartida
     {
+
+        public void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala)
+        {
+            if (listaSalasActivas.ContainsKey(codigoSala))
+            {
+                Sala sala = listaSalasActivas[codigoSala];
+
+                foreach (var jugador in sala.Jugadores.Values)
+                {
+                    try
+                    {
+                        jugador.CanalCallbackPartida?.MovimientoFicha(posicion, nombreJugador);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error al notificar posición intermedia para {jugador.NombreUsuario}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
         public void AgregarCanalCallbackPartida(string nombreJugador, string codigoSala)
         {
             if (listaSalasActivas.ContainsKey(codigoSala))

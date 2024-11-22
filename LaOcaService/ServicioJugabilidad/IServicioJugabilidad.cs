@@ -44,9 +44,13 @@ namespace LaOcaService
         [DataMember]
         public int PosicionActual { get; set; }
 
+        [DataMember]
+        public int PosicionAnterior { get; set; }
+
         public Ficha()
         {
             PosicionActual = 0;
+            PosicionAnterior = 0;
         }
     }
 

@@ -33,7 +33,7 @@ namespace LaOcaService
             return casillas;
         }
 
-        public void Mover(Ficha ficha, int pasos, List<Casilla> tablero, bool movimientoEspecial = false)
+        public void Mover(Ficha ficha, int pasos, List<Casilla> tablero)
         {
             if (ficha == null)
             {
@@ -68,29 +68,28 @@ namespace LaOcaService
                 switch (tipoCasilla)
                 {
                     case Utilidades.OCA:
-                        if (!movimientoEspecial)
+                        if (ficha.PosicionActual == 59)
+                        {
+                            ficha.PosicionActual = 63;
+                        }
+                        else
                         {
                             ficha.PosicionActual = _utilidades.ObtenerSiguienteOca(ficha.PosicionActual);
-                        }
-                        break;
-
-                    case Utilidades.PUENTE:
-                        if (!movimientoEspecial)
-                        {
-                            ficha.PosicionActual = ficha.PosicionActual == 6 ? 12 : 6;
                             return;
                         }
                         break;
 
+                    case Utilidades.PUENTE:
+                        ficha.PosicionActual = ficha.PosicionActual == 6 ? 12 : 6;
+                        break;
+
                     case Utilidades.POSADA:
-                        // No sa maneja nada en el servicio para esta casilla especial.
                         break;
 
                     case Utilidades.DADOS:
                         break;
 
                     case Utilidades.POZO:
-                        // Falta la implementación para el rescate de jugadores en el pozo.
                         break;
 
                     case Utilidades.LABERINTO:
@@ -98,7 +97,6 @@ namespace LaOcaService
                         break;
 
                     case Utilidades.CARCEL:
-                        // No sa maneja nada en el servicio para esta casilla especial.
                         break;
 
                     case Utilidades.CALAVERA:
@@ -106,7 +104,6 @@ namespace LaOcaService
                         break;
 
                     case Utilidades.META:
-                        // Falta la implementación para llegar a la casilla final.
                         break;
 
                     default:

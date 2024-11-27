@@ -101,6 +101,8 @@ namespace LaOcaService
         [DataMember]
         public string NombreUsuario { get; set; }
         [DataMember]
+        public int CasillasRecorridas { get; set; }
+        [DataMember]
         public int IdFotoPerfil { get; set; }
         [DataMember]
         public int IdPuntuacion { get; set; }
@@ -135,6 +137,7 @@ namespace LaOcaService
         {
             Invitaciones = new List<InvitacionPartida>();
             Amistades = new List<Amistad>();
+            CasillasRecorridas = 0;
         }
 
         public override bool Equals(object obj)

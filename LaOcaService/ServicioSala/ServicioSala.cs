@@ -71,7 +71,6 @@ namespace LaOcaService
             return resultado;
         }
 
-
         public Partida IniciarPartida(string codigoSala)
         {
             List<string> ordenDeTurnos = DecidirOrdenDeTurnos(listaSalasActivas[codigoSala]);
@@ -93,7 +92,6 @@ namespace LaOcaService
                     }
                 }
             }
-
             return nuevaPartida;
         }
 
@@ -128,7 +126,6 @@ namespace LaOcaService
                     parJugador.Value.CanalCallbackSala.ExpulsarAMenúPrincipal("El anfitrión ha abandonado la sala. Regresarás al Menú Principal.");
                 }
             }
-
             listaSalasActivas.Remove(codigoSala);
         }
     }
@@ -173,7 +170,6 @@ namespace LaOcaService
 
     public partial class LaOcaService : IServicioPartida
     {
-
         public void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala)
         {
             if (listaSalasActivas.ContainsKey(codigoSala))
@@ -188,7 +184,7 @@ namespace LaOcaService
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error al notificar posición intermedia para {jugador.NombreUsuario}: {ex.Message}");
+                        Console.WriteLine($"Error al notificar movimiento para {jugador.NombreUsuario}: {ex.Message}");
                     }
                 }
             }
@@ -216,7 +212,6 @@ namespace LaOcaService
 
                 Sala sala = listaSalasActivas[codigoSala];
                 string nombreJugadorActual = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual];
-
                 int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
                 string nombreSiguienteJugador = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador];
                 sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
@@ -235,7 +230,6 @@ namespace LaOcaService
                         }
                     });
                 }
-
                 return nombreSiguienteJugador;
             }
         }

@@ -68,15 +68,7 @@ namespace LaOcaService
                 switch (tipoCasilla)
                 {
                     case Utilidades.OCA:
-                        if (ficha.PosicionActual == 59)
-                        {
-                            ficha.PosicionActual = 63;
-                        }
-                        else
-                        {
-                            ficha.PosicionActual = _utilidades.ObtenerSiguienteOca(ficha.PosicionActual);
-                            return;
-                        }
+                        ficha.PosicionActual = _utilidades.ObtenerSiguienteOca(ficha.PosicionActual);
                         break;
 
                     case Utilidades.PUENTE:

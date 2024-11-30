@@ -29,7 +29,7 @@ namespace LaOcaService
             _jugadorDAO = new JugadorDAO();
             _aspectoDAO = new AspectoDAO();
 
-            InicializarJuego(); // Este método es de ServicioJugabilidad.cs
+            InicializarJuego();
         }
 
         public LaOcaService(ICuentaDAO cuentaDAO, IJugadorDAO jugadorDAO, IAspectoDAO aspectoDAO)
@@ -37,6 +37,32 @@ namespace LaOcaService
             _cuentaDAO = cuentaDAO ?? throw new ArgumentNullException(nameof(cuentaDAO));
             _jugadorDAO = jugadorDAO ?? throw new ArgumentNullException(nameof(jugadorDAO));
             _aspectoDAO = aspectoDAO ?? throw new ArgumentNullException(nameof(aspectoDAO));
+        }
+
+        public void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap)
+        {
+            using (var contexto = new LaOcaBDEntities())
+            {
+                foreach (var referencia in referenciaToIdMap)
+                {
+                    var idAspecto = referencia.Value;
+                    var urlImagen = referencia.Key;
+
+                    var aspectoExistente = contexto.Aspectos.Find(idAspecto);
+                    if (aspectoExistente == null)
+                    {
+                        var nuevoAspecto = new Aspectos
+                        {
+                            IdAspecto = idAspecto,
+                            tipo = "FotoPerfil",
+                            referencia = urlImagen
+                        };
+                        contexto.Aspectos.Add(nuevoAspecto);
+                    }
+                }
+
+                contexto.SaveChanges();
+            }
         }
 
         public void CrearCuenta(Cuenta cuenta, Jugador jugador, string referenciaImagen)
@@ -207,10 +233,14 @@ namespace LaOcaService
         {
             return _cuentaDAO.CorreoExiste(correoElectronico);
         }
-
-        public bool NombreUsuarioExiste(string nombreUsuario)
+        public bool NombreUsuarioExisteCrear(string nombreUsuario)
         {
-            return _jugadorDAO.NombreUsuarioExiste(nombreUsuario);
+            return _jugadorDAO.NombreUsuarioExisteCrear(nombreUsuario);
+        }
+
+        public bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual)
+        {
+            return _jugadorDAO.NombreUsuarioExisteModificar(nombreUsuario, idJugadorActual);
         }
 
     }

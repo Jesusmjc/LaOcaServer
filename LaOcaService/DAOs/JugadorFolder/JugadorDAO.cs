@@ -10,13 +10,8 @@ namespace LaOcaService.DAOs.JugadorFolder
 {
     public class JugadorDAO : IJugadorDAO
     {
-        //private readonly LaOcaBDEntities contexto;
         public JugadorDAO() {}
-        /*public JugadorDAO(LaOcaBDEntities contexto)
-        {
-            this.contexto = contexto;
-        }*/
-
+        
         public void CrearJugador(Jugador jugador, string referenciaImagen)
         {
             using (var contexto = new LaOcaBDEntities())
@@ -109,7 +104,7 @@ namespace LaOcaService.DAOs.JugadorFolder
             }
         }
 
-        public bool NombreUsuarioExiste(string nombreUsuario)
+        public bool NombreUsuarioExisteCrear(string nombreUsuario)
         {
             using (var contexto = new LaOcaBDEntities())
             {
@@ -117,5 +112,12 @@ namespace LaOcaService.DAOs.JugadorFolder
             }
         }
 
+        public bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual)
+        {
+            using (var contexto = new LaOcaBDEntities())
+            {
+                return contexto.Jugadores.Any(j => j.nombreUsuario == nombreUsuario && j.IdJugador != idJugadorActual);
+            }
+        }
     }
 }

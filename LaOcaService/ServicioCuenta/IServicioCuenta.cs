@@ -60,7 +60,13 @@ namespace LaOcaService
         bool CorreoExiste(string correoElectronico);
 
         [OperationContract]
-        bool NombreUsuarioExiste(string nombreUsuario);
+        bool NombreUsuarioExisteCrear(string nombreUsuario);
+
+        [OperationContract]
+        bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual);
+
+        [OperationContract]
+        void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap);
     }
 
     [DataContract]
@@ -159,6 +165,23 @@ namespace LaOcaService
         public override int GetHashCode()
         {
             return (IdJugador, NombreUsuario).GetHashCode();
+        }
+    }
+
+    [DataContract]
+    public class JugadorException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public JugadorException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public JugadorException(string mensaje)
+        {
+            Mensaje = mensaje;
         }
     }
 

@@ -53,9 +53,11 @@ namespace LaOcaService
             AmistadDAO amistadDAO = new AmistadDAO(new LaOcaDataAccess.LaOcaBDEntities());
             Amistad amistadExistente = amistadDAO.RecuperarAmistad(jugadorSolicitante.IdJugador, jugadorReceptor.IdJugador);
 
+            string estadoAmistad = "Solicitud";
+
             Amistad amistad = new Amistad
             {
-                Estado = "Solicitud",
+                Estado = estadoAmistad,
                 Fecha = DateTime.Now,
                 IdJugadorReceptor = jugadorReceptor.IdJugador,
                 IdJugadorSolicitante = jugadorSolicitante.IdJugador

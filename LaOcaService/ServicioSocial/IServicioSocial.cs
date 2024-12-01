@@ -41,11 +41,6 @@ namespace LaOcaService
         Amistad RecuperarAmistad(int idJugadorSolicitante, int idJugadorReceptor);
     }
 
-    //public interface IAmistadCallback
-    //{
-
-    //}
-
     [ServiceContract(CallbackContract = typeof(IBuzonCallback))]
     public interface IServicioBuzon
     {
@@ -61,6 +56,7 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void MostrarNuevaSolicitudAmistad(Amistad solicitudAmistad);
     }
+
 
     [DataContract]
     public class InvitacionPartida

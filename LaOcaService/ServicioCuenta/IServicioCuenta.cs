@@ -122,6 +122,10 @@ namespace LaOcaService
         public ISalaCallback CanalCallbackSala { get; set; }
         [DataMember]
         public IPartidaCallback CanalCallbackPartida { get; set; }
+
+        [DataMember]
+        public IActualizacionJugadoresEnSalaCallback CanalCallbackJugadoresEnSala { get; set; }
+
         [DataMember]
         public string FichaAsignada { get; set; }
 

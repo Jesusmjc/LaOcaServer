@@ -117,6 +117,12 @@ namespace LaOcaService.DAOs
                     amistadBD.estado = amistad.Estado;
                     amistadBD.fecha = amistad.Fecha;
 
+                    if (amistad.Estado.Equals("Bloqueo"))
+                    {
+                        amistadBD.IdJugadorSolicitante = amistad.IdJugadorSolicitante;
+                        amistadBD.IdJugadorReceptor = amistad.IdJugadorReceptor;
+                    }
+
                     resultado = contexto.SaveChanges();
                 }
                 else

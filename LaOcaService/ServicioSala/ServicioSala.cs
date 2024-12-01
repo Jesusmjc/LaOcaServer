@@ -63,6 +63,7 @@ namespace LaOcaService
                     }
 
                     nuevoJugador.CanalCallbackSala = OperationContext.Current.GetCallbackChannel<ISalaCallback>();
+
                     sala.Jugadores.Add(nuevoJugador.NombreUsuario, nuevoJugador);
 
                     resultado = 1;
@@ -105,32 +106,6 @@ namespace LaOcaService
 
             return nombresDeJugadoresEnOrdenDeTurnos;
         }
-
-        public void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala)
-        {
-            Sala salaObjetivo = listaSalasActivas[codigoSala];
-            salaObjetivo.Jugadores.Remove(nombreJugadorDesconectado);
-
-            foreach (var parJugador in salaObjetivo.Jugadores)
-            {
-                parJugador.Value.CanalCallbackSala.MostrarDesconexionJugador(nombreJugadorDesconectado);
-            }
-        }
-
-        public void EliminarSala(string codigoSala)
-        {
-            Sala salaObjetivo = listaSalasActivas[codigoSala];
-
-            foreach (var parJugador in salaObjetivo.Jugadores)
-            {
-                if (!parJugador.Value.NombreUsuario.Equals(salaObjetivo.NombreHost))
-                {
-                    parJugador.Value.CanalCallbackSala.ExpulsarAMenúPrincipal("El anfitrión ha abandonado la sala. Regresarás al Menú Principal.");
-                }
-            }
-
-            listaSalasActivas.Remove(codigoSala);
-        }
     }
 
     public partial class LaOcaService : IServicioRecuperarSala
@@ -153,21 +128,6 @@ namespace LaOcaService
             }
 
             return sala;
-        }
-    }
-
-    public partial class LaOcaService : IServicioExpulsionSala
-    {
-        public void ExpulsarJugador(string codigoSala, string nombreJugador)
-        {
-            listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
-            listaSalasActivas[codigoSala].Jugadores.Remove(nombreJugador);
-
-            foreach (var parJugador in listaSalasActivas[codigoSala].Jugadores)
-            {
-
-                parJugador.Value.CanalCallbackSala?.MostrarDesconexionJugador(parJugador.Key);
-            }
         }
     }
 
@@ -217,6 +177,62 @@ namespace LaOcaService
 
                 return nombreSiguienteJugador;
             }
+        }
+    }
+
+    public partial class LaOcaService : IServicioActualizacionJugadoresEnSala
+    {
+        public void AgregarCanalCallbackActualizacionJugadoresEnSala(string nombreJugador, string codigoSala)
+        {
+            if (listaSalasActivas.ContainsKey(codigoSala))
+            {
+                if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
+                {
+                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackJugadoresEnSala = OperationContext.Current.GetCallbackChannel<IActualizacionJugadoresEnSalaCallback>();
+                }
+            }
+        }
+
+        public void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala)
+        {
+            Sala salaObjetivo = listaSalasActivas[codigoSala];
+            salaObjetivo.Jugadores.Remove(nombreJugadorDesconectado);
+
+            foreach (var parJugador in salaObjetivo.Jugadores)
+            {
+                parJugador.Value.CanalCallbackJugadoresEnSala.MostrarDesconexionJugador(nombreJugadorDesconectado);
+            }
+        }
+
+        public void EliminarSala(string codigoSala)
+        {
+            Sala salaObjetivo = listaSalasActivas[codigoSala];
+
+            foreach (var parJugador in salaObjetivo.Jugadores)
+            {
+                if (!parJugador.Value.NombreUsuario.Equals(salaObjetivo.NombreHost))
+                {
+                    parJugador.Value.CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión ha abandonado la sala. Regresarás al Menú Principal.");
+                }
+            }
+
+            listaSalasActivas.Remove(codigoSala);
+        }
+
+        public void ExpulsarJugador(string codigoSala, string nombreJugador)
+        {
+            listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
+            listaSalasActivas[codigoSala].Jugadores.Remove(nombreJugador);
+
+            foreach (var parJugador in listaSalasActivas[codigoSala].Jugadores)
+            {
+                parJugador.Value.CanalCallbackJugadoresEnSala?.MostrarDesconexionJugador(parJugador.Key);
+            }
+        }
+
+        public void NotificarCambioEnAmistad(string codigoSala, string nombreJugadorEmisor, string nombreJugadorObjetivo)
+        {
+            listaSalasActivas[codigoSala].Jugadores[nombreJugadorObjetivo].CanalCallbackJugadoresEnSala.ActualizarEstadoAmistad(nombreJugadorEmisor);
         }
     }
 }

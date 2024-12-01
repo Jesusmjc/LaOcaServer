@@ -25,12 +25,6 @@ namespace LaOcaService
 
         [OperationContract]
         Partida IniciarPartida(string codigoSala);
-
-        [OperationContract]
-        void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala);
-
-        [OperationContract]
-        void EliminarSala(string codigoSala);
     }
 
     [ServiceContract]
@@ -41,13 +35,6 @@ namespace LaOcaService
         Sala RecuperarSala(string codigoSala);
     }
 
-    [ServiceContract]
-    public interface IServicioExpulsionSala
-    {
-        [OperationContract]
-        void ExpulsarJugador(string codigoSala, string nombreJugador);
-    }
-
     public interface ISalaCallback
     {
         [OperationContract(IsOneWay = true)]
@@ -55,12 +42,7 @@ namespace LaOcaService
 
         [OperationContract(IsOneWay = true)]
         void MostrarVentanaDePartida(Partida partida);
-
-        [OperationContract(IsOneWay = true)]
-        void MostrarDesconexionJugador(string nombreJugador);
-
-        [OperationContract(IsOneWay = true)]
-        void ExpulsarAMenúPrincipal(string motivo);
+ 
     }
 
     [ServiceContract(CallbackContract = typeof(IPartidaCallback))]
@@ -73,7 +55,6 @@ namespace LaOcaService
         string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala);
     }
 
-
     public interface IPartidaCallback
     {
         [OperationContract(IsOneWay = true)]
@@ -83,24 +64,36 @@ namespace LaOcaService
         void ActualizarPosicionFicha(int nuevaPosicion, string nombreJugador);
     }
 
-    //[ServiceContract]
-    //public interface IServicioActualizacionSalaYPartida
-    //{
-    //    [OperationContract]
-    //    void AgregarCanalCallbackActualizacionSalaPartida(string nombreJugador, string codigoSala);
+    [ServiceContract(CallbackContract = typeof(IActualizacionJugadoresEnSalaCallback))]
+    public interface IServicioActualizacionJugadoresEnSala
+    {
+        [OperationContract]
+        void AgregarCanalCallbackActualizacionJugadoresEnSala(string nombreJugador, string codigoSala);
 
-    //    [OperationContract]
-    //    void ExpulsarJugador(string codigoSala, string nombreJugador);
-    //}
+        [OperationContract]
+        void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala);
 
-    //public interface IActualizacionSalaYPartidaCallback
-    //{
-    //    [OperationContract(IsOneWay = true)]
-    //    void MostrarDesconexionJugador(string nombreJugador);
+        [OperationContract]
+        void EliminarSala(string codigoSala);
 
-    //    [OperationContract(IsOneWay = true)]
-    //    void ExpulsarAMenúPrincipal(string motivo);
-    //}
+        [OperationContract]
+        void ExpulsarJugador(string codigoSala, string nombreJugador);
+
+        [OperationContract]
+        void NotificarCambioEnAmistad(string codigoSala, string nombreJugadorEmisor, string nombreJugadorObjetivo);
+    }
+
+    public interface IActualizacionJugadoresEnSalaCallback
+    {
+        [OperationContract(IsOneWay = true)]
+        void MostrarDesconexionJugador(string nombreJugador);
+
+        [OperationContract(IsOneWay = true)]
+        void ExpulsarAMenúPrincipal(string motivo);
+
+        [OperationContract(IsOneWay = true)]
+        void ActualizarEstadoAmistad(string nombreJugadorEmisor);
+    }
 
 
     [DataContract]

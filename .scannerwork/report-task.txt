@@ -1,0 +1,6 @@
+projectKey=LaOcaServer
+serverUrl=http://localhost:9000
+serverVersion=10.7.0.96327
+dashboardUrl=http://localhost:9000/dashboard?id=LaOcaServer
+ceTaskId=f9bf0faf-151a-4fd2-91a6-1ff098637278
+ceTaskUrl=http://localhost:9000/api/ce/task?id=f9bf0faf-151a-4fd2-91a6-1ff098637278

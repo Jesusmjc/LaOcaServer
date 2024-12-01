@@ -1,0 +1,4 @@
+﻿C:\Users\jesus\OneDrive\Escritorio\_UV_\Séptimo Semestre\Tecnologías de Construcción\LaOca\LaOcaServer\LaOcaHost\Program.cs
+C:\Users\jesus\OneDrive\Escritorio\_UV_\Séptimo Semestre\Tecnologías de Construcción\LaOca\LaOcaServer\LaOcaHost\Properties\AssemblyInfo.cs
+C:\Users\jesus\OneDrive\Escritorio\_UV_\Séptimo Semestre\Tecnologías de Construcción\LaOca\LaOcaServer\LaOcaHost\App.config
+C:\Users\jesus\OneDrive\Escritorio\_UV_\Séptimo Semestre\Tecnologías de Construcción\LaOca\LaOcaServer\LaOcaHost\packages.config

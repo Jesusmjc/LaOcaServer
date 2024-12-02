@@ -25,10 +25,9 @@ namespace LaOcaService
 
         public LaOcaService()
         {
-            _cuentaDAO = new CuentaDAO();
-            _jugadorDAO = new JugadorDAO();
-            _aspectoDAO = new AspectoDAO();
-
+            _cuentaDAO = new CuentaDAO(new LaOcaBDEntities());
+            _jugadorDAO = new JugadorDAO(new LaOcaBDEntities());
+            _aspectoDAO = new AspectoDAO(new LaOcaBDEntities());
             InicializarJuego();
         }
 

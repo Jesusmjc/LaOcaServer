@@ -4,19 +4,22 @@ using Xunit;
 using LaOcaService.DAOs.AspectoFolder;
 using LaOcaDataAccess;
 using LaOcaService;
+using System.Data.Entity;
 
 namespace LaOcaTests.AspectoDAO
 {
     public class TestAspectoDAO : IDisposable
     {
-        private readonly LaOcaBDEntities contexto;
-        private LaOcaService.DAOs.AspectoFolder.AspectoDAO aspectoDAO;
-        private int idAspectoPrueba;
+        private readonly LaOcaBDEntities _contexto;
+        private readonly DbContextTransaction _transaccion;
+        private readonly LaOcaService.DAOs.AspectoFolder.AspectoDAO _aspectoDAO;
+        private int _idAspectoPrueba;
 
         public TestAspectoDAO()
         {
-            contexto = new LaOcaBDEntities();
-            aspectoDAO = new LaOcaService.DAOs.AspectoFolder.AspectoDAO();
+            _contexto = new LaOcaBDEntities();
+            _transaccion = _contexto.Database.BeginTransaction();
+            _aspectoDAO = new LaOcaService.DAOs.AspectoFolder.AspectoDAO(_contexto);
             PrepararBaseDeDatos();
         }
 
@@ -27,9 +30,9 @@ namespace LaOcaTests.AspectoDAO
                 tipo = "FotoPerfil",
                 referencia = "referenciaPrueba.jpg"
             };
-            contexto.Aspectos.Add(aspecto);
-            contexto.SaveChanges();
-            idAspectoPrueba = aspecto.IdAspecto;
+            _contexto.Aspectos.Add(aspecto);
+            _contexto.SaveChanges();
+            _idAspectoPrueba = aspecto.IdAspecto;
         }
 
         [Fact]
@@ -41,28 +44,24 @@ namespace LaOcaTests.AspectoDAO
                 Referencia = "iconoPrueba.png"
             };
 
-            aspectoDAO.CrearAspecto(nuevoAspecto);
+            _aspectoDAO.CrearAspecto(nuevoAspecto);
 
-            var aspectoBD = contexto.Aspectos.FirstOrDefault(a => a.referencia == "iconoPrueba.png");
+            var aspectoBD = _contexto.Aspectos.FirstOrDefault(a => a.referencia == "iconoPrueba.png");
             Assert.True(aspectoBD != null && aspectoBD.tipo == "Icono");
         }
 
         [Fact]
         public void PruebaObtenerAspectoPorId()
         {
-            var aspecto = aspectoDAO.ObtenerAspectoPorId(idAspectoPrueba);
+            var aspecto = _aspectoDAO.ObtenerAspectoPorId(_idAspectoPrueba);
             Assert.True(aspecto != null && aspecto.Referencia == "referenciaPrueba.jpg");
         }
 
         public void Dispose()
         {
-            var aspecto = contexto.Aspectos.Find(idAspectoPrueba);
-            if (aspecto != null)
-            {
-                contexto.Aspectos.Remove(aspecto);
-                contexto.SaveChanges();
-            }
-            contexto.Dispose();
+            _transaccion.Rollback();
+            _transaccion.Dispose();
+            _contexto.Dispose();
         }
     }
 }

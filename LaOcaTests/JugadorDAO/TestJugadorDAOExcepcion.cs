@@ -1,8 +1,5 @@
 ﻿using Xunit;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core;
-using System.Linq;
 using System.ServiceModel;
 using LaOcaService;
 using LaOcaDataAccess;
@@ -17,7 +14,7 @@ namespace LaOcaTests.JugadorDAO
         public TestJugadorDAOExcepcion()
         {
             _contexto = new LaOcaBDEntities();
-            _jugadorDAO = new LaOcaService.DAOs.JugadorFolder.JugadorDAO();
+            _jugadorDAO = new LaOcaService.DAOs.JugadorFolder.JugadorDAO(_contexto);
         }
 
         [Fact]
@@ -31,12 +28,12 @@ namespace LaOcaTests.JugadorDAO
                 NombreUsuario = "UsuarioPrueba"
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<JugadorException>>(() =>
             {
                 _jugadorDAO.CrearJugador(jugador, "referencia_imagen.jpg");
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -49,12 +46,12 @@ namespace LaOcaTests.JugadorDAO
                 IdFotoPerfil = 2
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<JugadorException>>(() =>
             {
                 _jugadorDAO.ModificarJugador(jugador);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -62,12 +59,12 @@ namespace LaOcaTests.JugadorDAO
         {
             int idJugadorInexistente = 999;
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<JugadorException>>(() =>
             {
                 _jugadorDAO.ObtenerJugadorPorId(idJugadorInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -75,12 +72,12 @@ namespace LaOcaTests.JugadorDAO
         {
             string nombreUsuarioInexistente = "NombreNoExistente";
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<JugadorException>>(() =>
             {
                 _jugadorDAO.NombreUsuarioExisteCrear(nombreUsuarioInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -89,12 +86,12 @@ namespace LaOcaTests.JugadorDAO
             string nombreUsuarioInexistente = "NombreNoExistente";
             int idJugadorInexistente = 999;
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<JugadorException>>(() =>
             {
                 _jugadorDAO.NombreUsuarioExisteModificar(nombreUsuarioInexistente, idJugadorInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using Xunit;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core;
-using System.Data.Entity.Validation;
 using LaOcaService;
 using LaOcaDataAccess;
+using System.ServiceModel;
 
 namespace LaOcaTests.AspectoDAO
 {
@@ -16,7 +14,7 @@ namespace LaOcaTests.AspectoDAO
         public TestAspectoDAOExcepcion()
         {
             _contexto = new LaOcaBDEntities();
-            _aspectoDAO = new LaOcaService.DAOs.AspectoFolder.AspectoDAO();
+            _aspectoDAO = new LaOcaService.DAOs.AspectoFolder.AspectoDAO(_contexto);
         }
 
         [Fact]
@@ -29,12 +27,12 @@ namespace LaOcaTests.AspectoDAO
                 Referencia = "path/to/icon.png"
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<AspectoException>>(() =>
             {
                 _aspectoDAO.CrearAspecto(aspecto);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -42,12 +40,12 @@ namespace LaOcaTests.AspectoDAO
         {
             int idAspectoInexistente = 999;
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<AspectoException>>(() =>
             {
                 _aspectoDAO.ObtenerAspectoPorId(idAspectoInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -60,12 +58,12 @@ namespace LaOcaTests.AspectoDAO
                 Referencia = "path/to/updated/icon.png"
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<AspectoException>>(() =>
             {
                 _aspectoDAO.ModificarAspecto(aspecto);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -78,21 +76,12 @@ namespace LaOcaTests.AspectoDAO
                 Referencia = null
             };
 
-            var excepcion = Assert.ThrowsAny<Exception>(() =>
+            var excepcion = Assert.Throws<FaultException<AspectoException>>(() =>
             {
                 _aspectoDAO.ModificarAspecto(aspecto);
             });
 
-            Assert.True(excepcion is DbEntityValidationException || excepcion is EntityException);
-            if (excepcion is DbEntityValidationException)
-            {
-                Assert.Contains("Error: ", excepcion.ToString());
-            }
-            else if (excepcion is EntityException)
-            {
-                Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
-            }
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
-
     }
 }

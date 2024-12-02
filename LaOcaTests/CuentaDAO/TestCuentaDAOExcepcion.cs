@@ -1,21 +1,20 @@
 ﻿using Xunit;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core;
 using LaOcaService;
 using LaOcaDataAccess;
+using System.ServiceModel;
 
 namespace LaOcaTests.CuentaDAO
 {
     public class TestCuentaDAOExcepcion
     {
         private readonly LaOcaBDEntities _contexto;
-        private LaOcaService.DAOs.CuentaDAO _cuentaDAO;
+        private LaOcaService.DAOs.CuentaFolder.CuentaDAO _cuentaDAO;
 
         public TestCuentaDAOExcepcion()
         {
             _contexto = new LaOcaBDEntities();
-            _cuentaDAO = new LaOcaService.DAOs.CuentaDAO();
+            _cuentaDAO = new LaOcaService.DAOs.CuentaFolder.CuentaDAO(_contexto);
         }
 
         [Fact]
@@ -28,12 +27,12 @@ namespace LaOcaTests.CuentaDAO
                 IdJugador = 999
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<CuentaException>>(() =>
             {
                 _cuentaDAO.CrearCuenta(cuenta);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -46,12 +45,12 @@ namespace LaOcaTests.CuentaDAO
                 Contrasena = "nuevaContraseña"
             };
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<CuentaException>>(() =>
             {
                 _cuentaDAO.ModificarCuenta(cuenta);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -59,12 +58,12 @@ namespace LaOcaTests.CuentaDAO
         {
             int idCuentaInexistente = 999;
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<CuentaException>>(() =>
             {
                 _cuentaDAO.ObtenerCuentaPorId(idCuentaInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -72,12 +71,12 @@ namespace LaOcaTests.CuentaDAO
         {
             string correoInexistente = "noexiste@correo.com";
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<CuentaException>>(() =>
             {
                 _cuentaDAO.ObtenerCuentaPorCorreo(correoInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
 
         [Fact]
@@ -85,12 +84,12 @@ namespace LaOcaTests.CuentaDAO
         {
             string correoInexistente = "noexiste@correo.com";
 
-            var excepcion = Assert.Throws<EntityException>(() =>
+            var excepcion = Assert.Throws<FaultException<CuentaException>>(() =>
             {
                 _cuentaDAO.CorreoExiste(correoInexistente);
             });
 
-            Assert.Contains("Error relacionado con la red o específico de la instancia", excepcion.ToString());
+            Assert.Contains("Ocurrió un error al conectar con la Base de Datos.", excepcion.Detail.Mensaje);
         }
     }
 }

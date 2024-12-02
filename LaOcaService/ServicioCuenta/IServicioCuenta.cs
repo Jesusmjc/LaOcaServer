@@ -109,6 +109,10 @@ namespace LaOcaService
         [DataMember]
         public int CasillasRecorridas { get; set; }
         [DataMember]
+        public int UltimaPosicion { get; set; }
+        [DataMember]
+        public bool HaLlegadoAMeta { get; set; }
+        [DataMember]
         public int IdFotoPerfil { get; set; }
         [DataMember]
         public int IdPuntuacion { get; set; }
@@ -186,6 +190,57 @@ namespace LaOcaService
     }
 
     [DataContract]
+    public class CuentaException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public CuentaException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public CuentaException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+    [DataContract]
+    public class AspectoException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public AspectoException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public AspectoException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+    [DataContract]
+    public class PuntuacionException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public PuntuacionException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public PuntuacionException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+        [DataContract]
     public class Aspecto
     {
         [DataMember]

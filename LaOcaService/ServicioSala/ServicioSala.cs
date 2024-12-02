@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LaOcaDataAccess;
+using LaOcaService.DAOs.PuntuacionFolder;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -176,6 +178,52 @@ namespace LaOcaService
             {
                 Sala sala = listaSalasActivas[codigoSala];
 
+                if (sala.Jugadores.ContainsKey(nombreJugador))
+                {
+                    var jugador = sala.Jugadores[nombreJugador];
+
+                    if (posicion != jugador.UltimaPosicion)
+                    {
+                        jugador.CasillasRecorridas++;
+                        jugador.UltimaPosicion = posicion;
+                    }
+
+                    if (posicion == 63 && !jugador.HaLlegadoAMeta)
+                    {
+                        jugador.HaLlegadoAMeta = true;
+
+                        var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                        foreach (var jugadorSala in sala.Jugadores.Values)
+                        {
+                            bool esGanador = jugadorSala.NombreUsuario == nombreJugador;
+                            puntuacionDAO.ActualizarEstadisticasJugador(
+                                jugadorSala.IdJugador,
+                                jugadorSala.CasillasRecorridas,
+                                esGanador
+                            );
+                        }
+
+                        var jugadoresOrdenados = sala.Jugadores.Values
+                        .OrderByDescending(j => j.HaLlegadoAMeta)
+                        .ThenByDescending(j => j.HaLlegadoAMeta ? 0 : j.UltimaPosicion)
+                        .ThenByDescending(j => j.CasillasRecorridas)
+                        .Select(j => new KeyValuePair<string, int>(j.NombreUsuario, j.CasillasRecorridas))
+                        .ToArray();
+
+                        foreach (var jugadorSala in sala.Jugadores.Values)
+                        {
+                            try
+                            {
+                                jugadorSala.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error al notificar victoria a {jugadorSala.NombreUsuario}: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+
                 foreach (var jugador in sala.Jugadores.Values)
                 {
                     try
@@ -218,7 +266,7 @@ namespace LaOcaService
 
                 foreach (var parJugador in sala.Jugadores)
                 {
-                    Task.Run(() =>
+                    Task.Run(() =>  
                     {
                         try
                         {

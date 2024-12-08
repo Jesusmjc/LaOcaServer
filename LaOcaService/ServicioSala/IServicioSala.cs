@@ -75,6 +75,9 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala);
 
+        [OperationContract(IsOneWay = true)]
+        void AbandonarPartida(string nombreJugador, string codigoSala);
+
     }
 
 
@@ -92,6 +95,8 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void MostrarPantallaVictoria(KeyValuePair<string, int>[] jugadoresOrdenados);
 
+        [OperationContract(IsOneWay = true)]
+        void NotificarAbandonoJugador(string nombreJugador);
     }
 
     //[ServiceContract]

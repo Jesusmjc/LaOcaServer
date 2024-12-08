@@ -223,7 +223,6 @@ namespace LaOcaService
                         }
                     }
                 }
-
                 foreach (var jugador in sala.Jugadores.Values)
                 {
                     try
@@ -259,26 +258,85 @@ namespace LaOcaService
                 }
 
                 Sala sala = listaSalasActivas[codigoSala];
-                string nombreJugadorActual = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionJugadorTurnoActual];
-                int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % sala.Jugadores.Count;
-                string nombreSiguienteJugador = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[posicionSiguienteJugador];
+                List<string> jugadoresRestantes = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos;
+
+                if (jugadoresRestantes.Count == 0)
+                {
+                    throw new InvalidOperationException("No hay jugadores restantes en la sala.");
+                }
+
+                int posicionSiguienteJugador = (posicionJugadorTurnoActual + 1) % jugadoresRestantes.Count;
+                string nombreSiguienteJugador = jugadoresRestantes[posicionSiguienteJugador];
                 sala.Partida.NombreJugadorEnTurno = nombreSiguienteJugador;
 
-                foreach (var parJugador in sala.Jugadores)
+                foreach (var jugador in sala.Jugadores.Values)
                 {
-                    Task.Run(() =>  
+                    try
+                    {
+                        jugador.CanalCallbackPartida?.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error al notificar nuevo turno para {jugador.NombreUsuario}: {ex.Message}");
+                    }
+                }
+                return nombreSiguienteJugador;
+            }
+        }
+
+        public void AbandonarPartida(string nombreJugador, string codigoSala)
+        {
+            lock (listaSalasActivas)
+            {
+                if (!listaSalasActivas.ContainsKey(codigoSala)) return;
+
+                Sala sala = listaSalasActivas[codigoSala];
+
+                if (sala.Jugadores.ContainsKey(nombreJugador))
+                {
+                    sala.Jugadores.Remove(nombreJugador);
+                    sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Remove(nombreJugador);
+
+                    foreach (var jugador in sala.Jugadores.Values)
                     {
                         try
                         {
-                            parJugador.Value.CanalCallbackPartida.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
+                            jugador.CanalCallbackPartida?.NotificarAbandonoJugador(nombreJugador);
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error al notificar al jugador {parJugador.Key}: {ex.Message}");
+                            Console.WriteLine($"Error al notificar abandono: {ex.Message}");
                         }
-                    });
+                    }
+
+                    if (sala.Jugadores.Count == 1)
+                    {
+                        var jugadorRestante = sala.Jugadores.Values.First();
+                        var jugadoresOrdenados = new[] { new KeyValuePair<string, int>(jugadorRestante.NombreUsuario, jugadorRestante.CasillasRecorridas) };
+                        jugadorRestante.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+
+                        listaSalasActivas.Remove(codigoSala);
+                    }
+                    else if (sala.Partida.NombreJugadorEnTurno == nombreJugador)
+                    {
+                        if (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Count > 0)
+                        {
+                            sala.Partida.NombreJugadorEnTurno = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[0];
+
+                            foreach (var jugador in sala.Jugadores.Values)
+                            {
+                                try
+                                {
+                                    jugador.CanalCallbackPartida?.MostrarNuevoJugadorEnTurno(sala.Partida.NombreJugadorEnTurno);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error al notificar nuevo turno: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
                 }
-                return nombreSiguienteJugador;
             }
         }
     }

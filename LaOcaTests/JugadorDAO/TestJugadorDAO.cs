@@ -28,9 +28,7 @@ namespace LaOcaTests.JugadorDAO
             var puntuacion = new Puntuaciones
             {
                 casillasRecorridasGlobal = 0,
-                monedasObtenidasGlobal = 0,
                 partidasGanadasGlobal = 0,
-                monedasActuales = 0
             };
             _contexto.Puntuaciones.Add(puntuacion);
             _contexto.SaveChanges();

@@ -12,6 +12,8 @@ using LaOcaService.DAOs;
 using LaOcaService.DAOs.CuentaFolder;
 using LaOcaService.DAOs.JugadorFolder;
 using LaOcaService.DAOs.AspectoFolder;
+using LaOcaService.DAOs.PuntuacionFolder;
+using System.ServiceModel;
 
 namespace LaOcaService
 {
@@ -240,6 +242,28 @@ namespace LaOcaService
         public bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual)
         {
             return _jugadorDAO.NombreUsuarioExisteModificar(nombreUsuario, idJugadorActual);
+        }
+
+        public string ConsultarEstadisticasJugador(int idJugador)
+        {
+            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+            var estadisticas = puntuacionDAO.ObtenerEstadisticasJugador(idJugador);
+
+            return $"Casillas Recorridas: {estadisticas.CasillasRecorridasGlobal}, Partidas Ganadas: {estadisticas.PartidasGanadasGlobal}";
+        }
+
+        public List<Jugador> ObtenerRankingGlobal()
+        {
+            try
+            {
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                return puntuacionDAO.ObtenerRankingGlobal();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener el ranking global: {ex.Message}");
+                throw new FaultException("Error al obtener el ranking global. Por favor, intente de nuevo más tarde.");
+            }
         }
 
     }

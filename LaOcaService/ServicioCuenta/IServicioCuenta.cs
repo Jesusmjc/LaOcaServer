@@ -67,6 +67,12 @@ namespace LaOcaService
 
         [OperationContract]
         void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap);
+
+        [OperationContract]
+        string ConsultarEstadisticasJugador(int idJugador);
+
+        [OperationContract]
+        List<Jugador> ObtenerRankingGlobal();
     }
 
     [DataContract]
@@ -109,6 +115,8 @@ namespace LaOcaService
         [DataMember]
         public int CasillasRecorridas { get; set; }
         [DataMember]
+        public int PartidasGanadas { get; set; }
+        [DataMember]
         public int UltimaPosicion { get; set; }
         [DataMember]
         public bool HaLlegadoAMeta { get; set; }
@@ -148,6 +156,7 @@ namespace LaOcaService
             Invitaciones = new List<InvitacionPartida>();
             Amistades = new List<Amistad>();
             CasillasRecorridas = 0;
+            PartidasGanadas = 0;
         }
 
         public override bool Equals(object obj)

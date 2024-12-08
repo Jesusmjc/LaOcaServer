@@ -178,9 +178,7 @@ namespace LaOcaService.DAOs.JugadorFolder
             var nuevaPuntuacion = new Puntuaciones
             {
                 casillasRecorridasGlobal = 0,
-                monedasObtenidasGlobal = 0,
                 partidasGanadasGlobal = 0,
-                monedasActuales = 0
             };
 
             contexto.Puntuaciones.Add(nuevaPuntuacion);

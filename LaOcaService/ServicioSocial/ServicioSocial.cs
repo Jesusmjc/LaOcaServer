@@ -48,30 +48,23 @@ namespace LaOcaService
 
     public partial class LaOcaService : IServicioAmistad
     {
-        public void EnviarSolicitudAmistad(Jugador jugadorSolicitante, Jugador jugadorReceptor)
+        public int RegistrarNuevaAmistad(Amistad nuevaAmistad, string nombreJugadorReceptor)
         {
             AmistadDAO amistadDAO = new AmistadDAO(new LaOcaDataAccess.LaOcaBDEntities());
-            Amistad amistadExistente = amistadDAO.RecuperarAmistad(jugadorSolicitante.IdJugador, jugadorReceptor.IdJugador);
+            Amistad amistadExistente = amistadDAO.RecuperarAmistad(nuevaAmistad.IdJugadorSolicitante, nuevaAmistad.IdJugadorReceptor);
 
-            string estadoAmistad = "Solicitud";
+            nuevaAmistad.Fecha = DateTime.Now;
 
-            Amistad amistad = new Amistad
-            {
-                Estado = estadoAmistad,
-                Fecha = DateTime.Now,
-                IdJugadorReceptor = jugadorReceptor.IdJugador,
-                IdJugadorSolicitante = jugadorSolicitante.IdJugador
-            };
+            int resultado = 0;
 
             if (amistadExistente.IdAmistad == 0)
             {
-                int resultado = amistadDAO.RegistrarNuevaAmistad(amistad);
+                resultado = amistadDAO.RegistrarNuevaAmistad(nuevaAmistad);
                 
                 if (resultado > 0)
                 {
-                    amistad.IdAmistad = resultado;
-                    listaJugadoresConectados[jugadorReceptor.NombreUsuario].Amistades.Add(amistad);
-                    listaJugadoresConectados[jugadorReceptor.NombreUsuario].CanalCallbackBuzon?.MostrarNuevaSolicitudAmistad(amistad);
+                    nuevaAmistad.IdAmistad = resultado;
+                    listaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
                 }
                 else
                 {
@@ -85,11 +78,10 @@ namespace LaOcaService
             {
                 if (!amistadExistente.Estado.Equals("Amigos") || !amistadExistente.Estado.Equals("Bloqueo"))
                 {
-                    amistad.IdAmistad = amistadExistente.IdAmistad;
-                    amistadDAO.ActualizarEstadoAmistad(amistad);
+                    nuevaAmistad.IdAmistad = amistadExistente.IdAmistad;
+                    amistadDAO.ActualizarEstadoAmistad(nuevaAmistad);
 
-                    listaJugadoresConectados[jugadorReceptor.NombreUsuario].Amistades.Add(amistad);
-                    listaJugadoresConectados[jugadorReceptor.NombreUsuario].CanalCallbackBuzon?.MostrarNuevaSolicitudAmistad(amistad);
+                    listaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
                 }
                 else if (amistadExistente.Estado.Equals("Amigos"))
                 {
@@ -105,22 +97,35 @@ namespace LaOcaService
                         new FaultReason("El jugador te ha bloqueado.")
                     );
                 }
-            }  
+            }
+
+            return resultado;
         }
 
         public void ActualizarSolicitudAmistad(Amistad solicitudAmistad, string nuevoEstado)
         {
             AmistadDAO amistadDAO = new AmistadDAO(new LaOcaDataAccess.LaOcaBDEntities());
 
+            string estadoPrevio = solicitudAmistad.Estado;
             solicitudAmistad.Estado = nuevoEstado;
             solicitudAmistad.Fecha = DateTime.Now;
 
             int resultado = amistadDAO.ActualizarEstadoAmistad(solicitudAmistad);
 
+            if (estadoPrevio.Equals("Amigos") && (nuevoEstado.Equals("Rechazada") || nuevoEstado.Equals("Bloqueo")))
+            {
+                Jugador amigoEliminado = ObtenerJugadorPorId(solicitudAmistad.IdJugadorReceptor);
+                if (listaJugadoresConectados.ContainsKey(amigoEliminado.NombreUsuario))
+                {
+                    amigoEliminado = listaJugadoresConectados[amigoEliminado.NombreUsuario];
+                    amigoEliminado.CanalCallbackJugadoresEnLinea?.OcultarJugadorQueTerminoAmistad(solicitudAmistad.IdJugadorSolicitante);
+                }
+            }
+
             if (resultado == 0)
             {
                 throw new FaultException<AmistadException>(
-                       new AmistadException("Ocurrió un error al procesar la solicitud de amistad. "),
+                       new AmistadException("Ocurrió un error al actualizar la solicitud de amistad. "),
                        new FaultReason("Error interno del servidor. ")
                    );
             }

@@ -116,12 +116,8 @@ namespace LaOcaService.DAOs
                 {
                     amistadBD.estado = amistad.Estado;
                     amistadBD.fecha = amistad.Fecha;
-
-                    if (amistad.Estado.Equals("Bloqueo"))
-                    {
-                        amistadBD.IdJugadorSolicitante = amistad.IdJugadorSolicitante;
-                        amistadBD.IdJugadorReceptor = amistad.IdJugadorReceptor;
-                    }
+                    amistadBD.IdJugadorSolicitante = amistad.IdJugadorSolicitante;
+                    amistadBD.IdJugadorReceptor = amistad.IdJugadorReceptor;
 
                     resultado = contexto.SaveChanges();
                 }
@@ -134,7 +130,7 @@ namespace LaOcaService.DAOs
                                          | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                          | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al actualizar una nueva amistad: ", ex);
+                logger.Error("Ocurrió una excepción al actualizar una amistad: ", ex);
 
                 throw new FaultException<AmistadException>(
                     new AmistadException("Ocurrió un error al conectar con la Base de Datos. "),

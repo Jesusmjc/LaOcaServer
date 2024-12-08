@@ -26,7 +26,7 @@ namespace LaOcaService
     {
         [OperationContract]
         [FaultContract(typeof(AmistadException))]
-        void EnviarSolicitudAmistad(Jugador jugadorSolicitante, Jugador jugadorReceptor);
+        int RegistrarNuevaAmistad(Amistad nuevaAmistad, string nombreJugadorReceptor);
 
         [OperationContract]
         [FaultContract(typeof(AmistadException))]
@@ -52,11 +52,7 @@ namespace LaOcaService
     {
         [OperationContract(IsOneWay = true)]
         void MostrarNuevaInvitacionAPartida(InvitacionPartida invitacion);
-
-        [OperationContract(IsOneWay = true)]
-        void MostrarNuevaSolicitudAmistad(Amistad solicitudAmistad);
     }
-
 
     [DataContract]
     public class InvitacionPartida
@@ -65,7 +61,7 @@ namespace LaOcaService
         public Jugador JugadorEmisor;
 
         [DataMember]
-        public String CodigoSalaObjetivo;
+        public string CodigoSalaObjetivo;
 
         public override bool Equals(object obj)
         {

@@ -35,5 +35,8 @@ namespace LaOcaService
 
         [OperationContract(IsOneWay = true)]
         void OcultarJugadorDesconectado(Jugador nombreJugadorDesconectado);
+
+        [OperationContract(IsOneWay = true)]
+        void OcultarJugadorQueTerminoAmistad(int idJugadorQueTerminoAmistad);
     }    
 }

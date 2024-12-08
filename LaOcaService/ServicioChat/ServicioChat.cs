@@ -13,12 +13,9 @@ namespace LaOcaService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class LaOcaService : IServicioChat
     {
-        //private readonly Dictionary<string, IChatCallback> clientes = new Dictionary<string, IChatCallback>();
         
         public void UnirseAlChat(string nombreJugador, string codigoSala)
         {
-            //IChatCallback callback = OperationContext.Current.GetCallbackChannel<IChatCallback>();
-
             if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
             {
                 listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
@@ -31,27 +28,53 @@ namespace LaOcaService
         {
             foreach (var cliente in listaSalasActivas[codigoSala].Jugadores)
             {
-                try
+                if (!cliente.Value.NombreUsuario.Equals(nombreJugador))
                 {
-                    cliente.Value.CanalCallbackChat.MostrarMensaje(nombreJugador, mensaje);
-                }
-                catch (CommunicationException ex)
+                    try
+                    {
+                        if (ValidarJugadorNoEstaBloqueado(cliente.Value.NombreUsuario, nombreJugador))
+                        {
+                            cliente.Value.CanalCallbackChat.MostrarMensaje(nombreJugador, mensaje);
+                        }
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        Console.WriteLine($"Error de comunicación con el cliente: {ex.Message}");
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        Console.WriteLine($"El cliente no respondió a tiempo: {ex.Message}");
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+                        Console.WriteLine($"El cliente se ha desconectado: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error inesperado al llamar al cliente: {ex.Message}");
+                    }
+                } 
+            }
+        }
+
+        private bool ValidarJugadorNoEstaBloqueado(string nombreJugadorReceptor, string nombreJugadorEmisor)
+        {
+            bool resultado = true;
+
+            Jugador jugadorReceptor = listaJugadoresConectados[nombreJugadorReceptor];
+            Jugador jugadorEmisor = listaJugadoresConectados[nombreJugadorEmisor];
+
+            Amistad amistad = RecuperarAmistad(jugadorEmisor.IdJugador, jugadorReceptor.IdJugador);
+
+            if (amistad.IdAmistad > 0)
+            {
+                if (amistad.Estado.Equals("Bloqueo"))
                 {
-                    Console.WriteLine($"Error de comunicación con el cliente: {ex.Message}");
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine($"El cliente no respondió a tiempo: {ex.Message}");
-                }
-                catch (ObjectDisposedException ex)
-                {
-                    Console.WriteLine($"El cliente se ha desconectado: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error inesperado al llamar al cliente: {ex.Message}");
+                    resultado = false;
                 }
             }
+
+            return resultado;
         }
     }
 }

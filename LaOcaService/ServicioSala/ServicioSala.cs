@@ -221,12 +221,17 @@ namespace LaOcaService
 
         public void ExpulsarJugador(string codigoSala, string nombreJugador)
         {
-            listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
-            listaSalasActivas[codigoSala].Jugadores.Remove(nombreJugador);
+            Sala salaObjetivo = listaSalasActivas[codigoSala];
+            salaObjetivo.Jugadores[nombreJugador].CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
+            salaObjetivo.Jugadores.Remove(nombreJugador);
+            string nombreHost = salaObjetivo.NombreHost;
 
-            foreach (var parJugador in listaSalasActivas[codigoSala].Jugadores)
+            foreach (var parJugador in salaObjetivo.Jugadores)
             {
-                parJugador.Value.CanalCallbackJugadoresEnSala?.MostrarDesconexionJugador(parJugador.Key);
+                if (!parJugador.Key.Equals(nombreHost))
+                {
+                    parJugador.Value.CanalCallbackJugadoresEnSala?.MostrarDesconexionJugador(nombreJugador);
+                }
             }
         }
 

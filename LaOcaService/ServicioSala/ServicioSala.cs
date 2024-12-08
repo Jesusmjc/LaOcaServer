@@ -34,14 +34,7 @@ namespace LaOcaService
 
         public bool VerificarCodigoSalaEsUnico(string codigoSala)
         {
-            bool esCodigoUnico = false;
-
-            if (!listaSalasActivas.ContainsKey(codigoSala))
-            {
-                esCodigoUnico = true;
-            }
-
-            return esCodigoUnico;
+            return !listaSalasActivas.ContainsKey(codigoSala);
         }
 
         public int AgregarJugadorASala(Jugador nuevoJugador, string codigoSala)
@@ -224,8 +217,8 @@ namespace LaOcaService
             Sala salaObjetivo = listaSalasActivas[codigoSala];
             salaObjetivo.Jugadores[nombreJugador].CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
             salaObjetivo.Jugadores.Remove(nombreJugador);
-            string nombreHost = salaObjetivo.NombreHost;
 
+            string nombreHost = salaObjetivo.NombreHost;
             foreach (var parJugador in salaObjetivo.Jugadores)
             {
                 if (!parJugador.Key.Equals(nombreHost))

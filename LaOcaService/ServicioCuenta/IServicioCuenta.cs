@@ -98,18 +98,28 @@ namespace LaOcaService
     {
         [DataMember]
         public int IdJugador { get; set; }
+
         [DataMember]
         public string NombreUsuario { get; set; }
+
+        [DataMember]
+        public bool EsInvitado { get; set; }
+
         [DataMember]
         public int IdFotoPerfil { get; set; }
+
         [DataMember]
         public int IdPuntuacion { get; set; }
+
         [DataMember]
         public int IdCuenta { get; set; }
+
         [DataMember]
         public Ficha Ficha { get; set; }
+
         [DataMember]
         public int TurnosPerdidos { get; set; }
+
         [DataMember]
         public  List<InvitacionPartida> Invitaciones { get; set; }
 

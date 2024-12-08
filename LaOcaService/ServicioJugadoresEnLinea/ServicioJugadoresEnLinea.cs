@@ -20,9 +20,12 @@ namespace LaOcaService
                 listaJugadoresConectados.Add(nuevoJugadorConectado.NombreUsuario, nuevoJugadorConectado);
                 resultado = 1;
 
-                foreach (var parJugador in listaJugadoresConectados)
+                if (!nuevoJugadorConectado.EsInvitado)
                 {
-                    parJugador.Value.CanalCallbackJugadoresEnLinea?.MostrarNuevoJugadorConectado(nuevoJugadorConectado);
+                    foreach (var parJugador in listaJugadoresConectados)
+                    {
+                        parJugador.Value.CanalCallbackJugadoresEnLinea?.MostrarNuevoJugadorConectado(nuevoJugadorConectado);
+                    }
                 }
             }
 
@@ -35,11 +38,14 @@ namespace LaOcaService
             {
                 listaJugadoresConectados.Remove(jugadorDesconectado.NombreUsuario);
 
-                foreach (var parJugador in listaJugadoresConectados)
+                if (!jugadorDesconectado.EsInvitado)
                 {
-                    if (!parJugador.Key.Equals(jugadorDesconectado.NombreUsuario))
+                    foreach (var parJugador in listaJugadoresConectados)
                     {
-                        parJugador.Value.CanalCallbackJugadoresEnLinea?.OcultarJugadorDesconectado(jugadorDesconectado);
+                        if (!parJugador.Key.Equals(jugadorDesconectado.NombreUsuario))
+                        {
+                            parJugador.Value.CanalCallbackJugadoresEnLinea?.OcultarJugadorDesconectado(jugadorDesconectado);
+                        }
                     }
                 }
             }

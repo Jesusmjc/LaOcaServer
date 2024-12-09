@@ -59,7 +59,6 @@
     <Compile Include="Aspectos.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Class1.cs" />
     <Compile Include="Cuentas.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

@@ -20,39 +20,51 @@ namespace LaOcaService.DAOs.PuntuacionFolder
             this.contexto = contexto;
         }
 
+
+
         public void ActualizarEstadisticasJugador(int idJugador, int casillasRecorridas, bool ganoPartida)
         {
-            try
+            const int MaxReintentos = 3;
+            int intentos = 0;
+            bool guardadoExitoso = false;
+
+            while (!guardadoExitoso && intentos < MaxReintentos)
             {
-                var puntuacion = contexto.Puntuaciones.FirstOrDefault(p => p.IdJugador == idJugador);
-
-                if (puntuacion == null)
+                try
                 {
-                    throw new KeyNotFoundException($"No se encontró una puntuación asociada al jugador con ID {idJugador}.");
+                    var puntuacion = contexto.Puntuaciones.FirstOrDefault(p => p.IdJugador == idJugador);
+
+                    if (puntuacion == null)
+                    {
+                        throw new KeyNotFoundException($"No se encontró una puntuación asociada al jugador con ID {idJugador}.");
+                    }
+
+                    puntuacion.casillasRecorridasGlobal += casillasRecorridas;
+
+                    if (ganoPartida)
+                    {
+                        puntuacion.partidasGanadasGlobal += 1;
+                    }
+
+                    contexto.SaveChanges();
+                    guardadoExitoso = true;
                 }
-
-                puntuacion.casillasRecorridasGlobal += casillasRecorridas;
-
-                if (ganoPartida)
+                catch (Exception ex) when (ex is SqlException || ex is EntityException || ex is TimeoutException)
                 {
-                    puntuacion.partidasGanadasGlobal += 1;
-                }
+                    intentos++;
+                    if (intentos >= MaxReintentos)
+                    {
+                        // Registrar fallo y propagar la excepción para manejo posterior
+                        logger.Error("Error al guardar estadísticas después de varios intentos: ", ex);
+                        throw;
+                    }
 
-                contexto.SaveChanges();
-                logger.Info($"Estadísticas actualizadas para el jugador con ID: {idJugador}. " +
-                            $"Casillas recorridas: {puntuacion.casillasRecorridasGlobal}, Partidas ganadas: {puntuacion.partidasGanadasGlobal}");
-            }
-            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
-                                       ex is InvalidOperationException || ex is EntityException ||
-                                       ex is TimeoutException || ex is DbEntityValidationException)
-            {
-                logger.Error("Error al actualizar estadísticas del jugador: ", ex);
-                throw new FaultException<PuntuacionException>(
-                    new PuntuacionException("Ocurrió un error al conectar con la Base de Datos."),
-                    new FaultReason("Error interno del servidor.")
-                );
+                    // Retrasar antes de reintentar
+                    System.Threading.Thread.Sleep(2000);
+                }
             }
         }
+
 
         public (int CasillasRecorridasGlobal, int PartidasGanadasGlobal) ObtenerEstadisticasJugador(int idJugador)
         {

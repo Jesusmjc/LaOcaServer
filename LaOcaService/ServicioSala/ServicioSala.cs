@@ -7,6 +7,9 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
+using System.Data.Entity.Core;
+using System.Data.SqlClient;
 
 namespace LaOcaService
 {
@@ -151,6 +154,72 @@ namespace LaOcaService
 
     public partial class LaOcaService : IServicioPartida
     {
+
+        public async Task GuardarEstadisticasJugadorAsync(int idJugador, int casillasRecorridas, bool ganoPartida)
+        {
+            try
+            {
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                await Task.Run(() => puntuacionDAO.ActualizarEstadisticasJugador(idJugador, casillasRecorridas, ganoPartida));
+            }
+            catch (Exception ex)
+            {
+                throw new FaultException($"Error al guardar estadísticas: {ex.Message}");
+            }
+        }
+
+        private static readonly List<OperacionPendiente> operacionesPendientes = new List<OperacionPendiente>();
+
+
+        public void GuardarEstadisticasJugador(int idJugador, int casillasRecorridas, bool ganoPartida)
+        {
+            try
+            {
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                puntuacionDAO.ActualizarEstadisticasJugador(idJugador, casillasRecorridas, ganoPartida);
+            }
+            catch (Exception ex)
+            {
+                _loggerSala.Error($"Error al guardar estadísticas para el jugador {idJugador}: {ex.Message}");
+
+                operacionesPendientes.Add(new OperacionPendiente
+                {
+                    IdJugador = idJugador,
+                    CasillasRecorridas = casillasRecorridas,
+                    GanoPartida = ganoPartida
+                });
+            }
+        }
+
+        public void ReintentarOperacionesPendientes()
+        {
+            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+
+            foreach (var operacion in operacionesPendientes.ToList())
+            {
+                try
+                {
+                    puntuacionDAO.ActualizarEstadisticasJugador(
+                        operacion.IdJugador,
+                        operacion.CasillasRecorridas,
+                        operacion.GanoPartida
+                    );
+
+                    operacionesPendientes.Remove(operacion);
+
+                    _loggerSala.Info($"Operación completada para el jugador {operacion.IdJugador}");
+                }
+                catch (Exception ex)
+                {
+                    _loggerSala.Error($"Error al reintentar operación para el jugador {operacion.IdJugador}: {ex.Message}");
+                }
+            }
+        }
+
+
+        public void Heartbeat()
+        {
+        }
         public void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala)
         {
             if (listaSalasActivas.ContainsKey(codigoSala))
@@ -222,10 +291,85 @@ namespace LaOcaService
             {
                 if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
                 {
-                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackPartida = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
+                    var callback = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
+                    var communicationObject = callback as ICommunicationObject;
+
+                    if (communicationObject != null)
+                    {
+                        communicationObject.Closed += (sender, args) => ManejarDesconexionJugador(nombreJugador, codigoSala);
+                        communicationObject.Faulted += (sender, args) => ManejarDesconexionJugador(nombreJugador, codigoSala);
+                    }
+
+                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackPartida = callback;
                 }
             }
         }
+
+        private void ManejarDesconexionJugador(string nombreJugador, string codigoSala)
+        {
+            lock (listaSalasActivas)
+            {
+                if (!listaSalasActivas.ContainsKey(codigoSala)) return;
+
+                Sala sala = listaSalasActivas[codigoSala];
+
+                if (sala.Jugadores.ContainsKey(nombreJugador))
+                {
+                    sala.Jugadores.Remove(nombreJugador);
+                    sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Remove(nombreJugador);
+
+                    foreach (var jugador in sala.Jugadores.Values)
+                    {
+                        try
+                        {
+                            jugador.CanalCallbackPartida?.NotificarAbandonoJugador(nombreJugador);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error al notificar abandono: {ex.Message}");
+                        }
+                    }
+
+                    if (sala.Jugadores.Count == 1)
+                    {
+                        var jugadorRestante = sala.Jugadores.Values.First();
+                        var jugadoresOrdenados = new[] { new KeyValuePair<string, int>(jugadorRestante.NombreUsuario, jugadorRestante.CasillasRecorridas) };
+
+                        var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                        puntuacionDAO.ActualizarEstadisticasJugador(
+                            jugadorRestante.IdJugador,
+                            jugadorRestante.CasillasRecorridas,
+                            true 
+                        );
+
+                        jugadorRestante.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+
+                        listaSalasActivas.Remove(codigoSala);
+                    }
+                    else if (sala.Partida.NombreJugadorEnTurno == nombreJugador)
+                    {
+                        if (sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Count > 0)
+                        {
+                            sala.Partida.NombreJugadorEnTurno = sala.Partida.NombresDeJugadoresEnOrdenDeTurnos[0];
+
+                            foreach (var jugador in sala.Jugadores.Values)
+                            {
+                                try
+                                {
+                                    jugador.CanalCallbackPartida?.MostrarNuevoJugadorEnTurno(sala.Partida.NombreJugadorEnTurno);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error al notificar nuevo turno: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         public string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala)
         {
@@ -301,6 +445,13 @@ namespace LaOcaService
                         var jugadorRestante = sala.Jugadores.Values.First();
                         var jugadoresOrdenados = new[] { new KeyValuePair<string, int>(jugadorRestante.NombreUsuario, jugadorRestante.CasillasRecorridas) };
                         jugadorRestante.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+
+                        var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                        puntuacionDAO.ActualizarEstadisticasJugador(
+                            jugadorRestante.IdJugador,
+                            jugadorRestante.CasillasRecorridas,
+                            true
+                        );
 
                         listaSalasActivas.Remove(codigoSala);
                     }

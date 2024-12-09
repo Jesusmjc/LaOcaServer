@@ -65,4 +65,12 @@ namespace LaOcaService
             return posicionActual;
         }
     }
+
+    public class OperacionPendiente
+    {
+        public int IdJugador { get; set; }
+        public int CasillasRecorridas { get; set; }
+        public bool GanoPartida { get; set; }
+    }
+
 }

@@ -60,6 +60,13 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void AbandonarPartida(string nombreJugador, string codigoSala);
 
+        [OperationContract(IsOneWay = true)]
+        void Heartbeat();
+
+        [OperationContract]
+        Task GuardarEstadisticasJugadorAsync(int idJugador, int casillasRecorridas, bool ganoPartida);
+
+
     }
 
     public interface IPartidaCallback

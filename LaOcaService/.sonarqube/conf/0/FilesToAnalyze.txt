@@ -1,0 +1,14 @@
+﻿C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Amistades.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Aspectos.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Class1.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Cuentas.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Jugadores.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\JugadoresAspectos.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Properties\AssemblyInfo.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Puntuaciones.cs
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Model1.Context.tt
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Model1.tt
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Model1.edmx
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\App.config
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\Model1.edmx.diagram
+C:\Users\Carim\OneDrive\Documents\LaOcaServer\LaOcaDataAccess\packages.config

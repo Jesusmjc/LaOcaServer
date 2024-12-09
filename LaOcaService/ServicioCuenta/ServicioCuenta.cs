@@ -12,6 +12,8 @@ using LaOcaService.DAOs;
 using LaOcaService.DAOs.CuentaFolder;
 using LaOcaService.DAOs.JugadorFolder;
 using LaOcaService.DAOs.AspectoFolder;
+using LaOcaService.DAOs.PuntuacionFolder;
+using System.ServiceModel;
 
 namespace LaOcaService
 {
@@ -25,11 +27,10 @@ namespace LaOcaService
 
         public LaOcaService()
         {
-            _cuentaDAO = new CuentaDAO();
-            _jugadorDAO = new JugadorDAO();
-            _aspectoDAO = new AspectoDAO();
-
-            InicializarJuego(); // Este método es de ServicioJugabilidad.cs
+            _cuentaDAO = new CuentaDAO(new LaOcaBDEntities());
+            _jugadorDAO = new JugadorDAO(new LaOcaBDEntities());
+            _aspectoDAO = new AspectoDAO(new LaOcaBDEntities());
+            InicializarJuego();
         }
 
         public LaOcaService(ICuentaDAO cuentaDAO, IJugadorDAO jugadorDAO, IAspectoDAO aspectoDAO)
@@ -37,6 +38,32 @@ namespace LaOcaService
             _cuentaDAO = cuentaDAO ?? throw new ArgumentNullException(nameof(cuentaDAO));
             _jugadorDAO = jugadorDAO ?? throw new ArgumentNullException(nameof(jugadorDAO));
             _aspectoDAO = aspectoDAO ?? throw new ArgumentNullException(nameof(aspectoDAO));
+        }
+
+        public void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap)
+        {
+            using (var contexto = new LaOcaBDEntities())
+            {
+                foreach (var referencia in referenciaToIdMap)
+                {
+                    var idAspecto = referencia.Value;
+                    var urlImagen = referencia.Key;
+
+                    var aspectoExistente = contexto.Aspectos.Find(idAspecto);
+                    if (aspectoExistente == null)
+                    {
+                        var nuevoAspecto = new Aspectos
+                        {
+                            IdAspecto = idAspecto,
+                            tipo = "FotoPerfil",
+                            referencia = urlImagen
+                        };
+                        contexto.Aspectos.Add(nuevoAspecto);
+                    }
+                }
+
+                contexto.SaveChanges();
+            }
         }
 
         public void CrearCuenta(Cuenta cuenta, Jugador jugador, string referenciaImagen)
@@ -207,10 +234,36 @@ namespace LaOcaService
         {
             return _cuentaDAO.CorreoExiste(correoElectronico);
         }
-
-        public bool NombreUsuarioExiste(string nombreUsuario)
+        public bool NombreUsuarioExisteCrear(string nombreUsuario)
         {
-            return _jugadorDAO.NombreUsuarioExiste(nombreUsuario);
+            return _jugadorDAO.NombreUsuarioExisteCrear(nombreUsuario);
+        }
+
+        public bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual)
+        {
+            return _jugadorDAO.NombreUsuarioExisteModificar(nombreUsuario, idJugadorActual);
+        }
+
+        public string ConsultarEstadisticasJugador(int idJugador)
+        {
+            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+            var estadisticas = puntuacionDAO.ObtenerEstadisticasJugador(idJugador);
+
+            return $": {estadisticas.CasillasRecorridasGlobal}, : {estadisticas.PartidasGanadasGlobal}";
+        }
+
+        public List<Jugador> ObtenerRankingGlobal()
+        {
+            try
+            {
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                return puntuacionDAO.ObtenerRankingGlobal();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener el ranking global: {ex.Message}");
+                throw new FaultException("Error al obtener el ranking global. Por favor, intente de nuevo más tarde.");
+            }
         }
 
     }

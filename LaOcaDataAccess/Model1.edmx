@@ -4,13 +4,13 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="LaOcaBDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Alias="Self" Namespace="LaOcaBDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012">
         <EntityType Name="Amistades">
           <Key>
             <PropertyRef Name="IdAmistad" />
           </Key>
-          <Property Name="IdAmistad" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="estado" Type="nvarchar" MaxLength="10" />
+          <Property Name="IdAmistad" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
+          <Property Name="estado" MaxLength="10" Type="nvarchar" />
           <Property Name="fecha" Type="date" />
           <Property Name="IdJugadorSolicitante" Type="int" />
           <Property Name="IdJugadorReceptor" Type="int" />
@@ -19,25 +19,25 @@
           <Key>
             <PropertyRef Name="IdAspecto" />
           </Key>
-          <Property Name="IdAspecto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="tipo" Type="nvarchar" MaxLength="10" />
-          <Property Name="referencia" Type="nvarchar" MaxLength="100" />
+          <Property Name="IdAspecto" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
+          <Property Name="tipo" MaxLength="10" Type="nvarchar" />
+          <Property Name="referencia" MaxLength="100" Type="nvarchar" />
         </EntityType>
         <EntityType Name="Cuentas">
           <Key>
             <PropertyRef Name="IdCuenta" />
           </Key>
-          <Property Name="IdCuenta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="correoElectronico" Type="nvarchar" MaxLength="60" />
-          <Property Name="contrasena" Type="nvarchar" MaxLength="64" />
+          <Property Name="IdCuenta" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
+          <Property Name="correoElectronico" MaxLength="60" Type="nvarchar" />
+          <Property Name="contrasena" MaxLength="64" Type="nvarchar" />
           <Property Name="IdJugador" Type="int" />
         </EntityType>
         <EntityType Name="Jugadores">
           <Key>
             <PropertyRef Name="IdJugador" />
           </Key>
-          <Property Name="IdJugador" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="nombreUsuario" Type="nvarchar" MaxLength="40" />
+          <Property Name="IdJugador" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
+          <Property Name="nombreUsuario" MaxLength="40" Type="nvarchar" />
           <Property Name="IdPuntuacion" Type="int" />
           <Property Name="IdFotoPerfil" Type="int" />
           <Property Name="IdCuenta" Type="int" />
@@ -46,7 +46,7 @@
           <Key>
             <PropertyRef Name="IdJugadorAspecto" />
           </Key>
-          <Property Name="IdJugadorAspecto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdJugadorAspecto" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
           <Property Name="IdJugador" Type="int" />
           <Property Name="IdAspecto" Type="int" />
         </EntityType>
@@ -54,16 +54,14 @@
           <Key>
             <PropertyRef Name="IdPuntuacion" />
           </Key>
-          <Property Name="IdPuntuacion" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdPuntuacion" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
           <Property Name="casillasRecorridasGlobal" Type="int" />
-          <Property Name="monedasObtenidasGlobal" Type="int" />
           <Property Name="partidasGanadasGlobal" Type="int" />
-          <Property Name="monedasActuales" Type="int" />
           <Property Name="IdJugador" Type="int" />
         </EntityType>
         <Association Name="FK_Amistades_JugadorReceptor">
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1" />
-          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <End Type="Self.Jugadores" Multiplicity="0..1" Role="Jugadores" />
+          <End Type="Self.Amistades" Multiplicity="*" Role="Amistades" />
           <ReferentialConstraint>
             <Principal Role="Jugadores">
               <PropertyRef Name="IdJugador" />
@@ -74,10 +72,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Amistades_JugadorSolicitante">
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+          <End Type="Self.Jugadores" Multiplicity="0..1" Role="Jugadores">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Amistades" Type="Self.Amistades" Multiplicity="*" />
+          <End Type="Self.Amistades" Multiplicity="*" Role="Amistades" />
           <ReferentialConstraint>
             <Principal Role="Jugadores">
               <PropertyRef Name="IdJugador" />
@@ -88,10 +86,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Jugador_Cuenta">
-          <End Role="Cuentas" Type="Self.Cuentas" Multiplicity="0..1">
+          <End Type="Self.Cuentas" Multiplicity="0..1" Role="Cuentas">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <End Type="Self.Jugadores" Multiplicity="*" Role="Jugadores" />
           <ReferentialConstraint>
             <Principal Role="Cuentas">
               <PropertyRef Name="IdCuenta" />
@@ -102,10 +100,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Jugador_FotoPerfil">
-          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1">
+          <End Type="Self.Aspectos" Multiplicity="0..1" Role="Aspectos">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <End Type="Self.Jugadores" Multiplicity="*" Role="Jugadores" />
           <ReferentialConstraint>
             <Principal Role="Aspectos">
               <PropertyRef Name="IdAspecto" />
@@ -116,10 +114,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Jugador_Puntuacion">
-          <End Role="Puntuaciones" Type="Self.Puntuaciones" Multiplicity="0..1">
+          <End Type="Self.Puntuaciones" Multiplicity="0..1" Role="Puntuaciones">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="*" />
+          <End Type="Self.Jugadores" Multiplicity="*" Role="Jugadores" />
           <ReferentialConstraint>
             <Principal Role="Puntuaciones">
               <PropertyRef Name="IdPuntuacion" />
@@ -130,8 +128,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_JugadorAspecto_Aspecto">
-          <End Role="Aspectos" Type="Self.Aspectos" Multiplicity="0..1" />
-          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <End Type="Self.Aspectos" Multiplicity="0..1" Role="Aspectos" />
+          <End Type="Self.JugadoresAspectos" Multiplicity="*" Role="JugadoresAspectos" />
           <ReferentialConstraint>
             <Principal Role="Aspectos">
               <PropertyRef Name="IdAspecto" />
@@ -142,10 +140,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_JugadorAspecto_Jugador">
-          <End Role="Jugadores" Type="Self.Jugadores" Multiplicity="0..1">
+          <End Type="Self.Jugadores" Multiplicity="0..1" Role="Jugadores">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="JugadoresAspectos" Type="Self.JugadoresAspectos" Multiplicity="*" />
+          <End Type="Self.JugadoresAspectos" Multiplicity="*" Role="JugadoresAspectos" />
           <ReferentialConstraint>
             <Principal Role="Jugadores">
               <PropertyRef Name="IdJugador" />
@@ -163,32 +161,32 @@
           <EntitySet Name="JugadoresAspectos" EntityType="Self.JugadoresAspectos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Puntuaciones" EntityType="Self.Puntuaciones" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Amistades_JugadorReceptor" Association="Self.FK_Amistades_JugadorReceptor">
-            <End Role="Jugadores" EntitySet="Jugadores" />
-            <End Role="Amistades" EntitySet="Amistades" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
+            <End EntitySet="Amistades" Role="Amistades" />
           </AssociationSet>
           <AssociationSet Name="FK_Amistades_JugadorSolicitante" Association="Self.FK_Amistades_JugadorSolicitante">
-            <End Role="Jugadores" EntitySet="Jugadores" />
-            <End Role="Amistades" EntitySet="Amistades" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
+            <End EntitySet="Amistades" Role="Amistades" />
           </AssociationSet>
           <AssociationSet Name="FK_Jugador_Cuenta" Association="Self.FK_Jugador_Cuenta">
-            <End Role="Cuentas" EntitySet="Cuentas" />
-            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End EntitySet="Cuentas" Role="Cuentas" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
           </AssociationSet>
           <AssociationSet Name="FK_Jugador_FotoPerfil" Association="Self.FK_Jugador_FotoPerfil">
-            <End Role="Aspectos" EntitySet="Aspectos" />
-            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End EntitySet="Aspectos" Role="Aspectos" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
           </AssociationSet>
           <AssociationSet Name="FK_Jugador_Puntuacion" Association="Self.FK_Jugador_Puntuacion">
-            <End Role="Puntuaciones" EntitySet="Puntuaciones" />
-            <End Role="Jugadores" EntitySet="Jugadores" />
+            <End EntitySet="Puntuaciones" Role="Puntuaciones" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
           </AssociationSet>
           <AssociationSet Name="FK_JugadorAspecto_Aspecto" Association="Self.FK_JugadorAspecto_Aspecto">
-            <End Role="Aspectos" EntitySet="Aspectos" />
-            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+            <End EntitySet="Aspectos" Role="Aspectos" />
+            <End EntitySet="JugadoresAspectos" Role="JugadoresAspectos" />
           </AssociationSet>
           <AssociationSet Name="FK_JugadorAspecto_Jugador" Association="Self.FK_JugadorAspecto_Jugador">
-            <End Role="Jugadores" EntitySet="Jugadores" />
-            <End Role="JugadoresAspectos" EntitySet="JugadoresAspectos" />
+            <End EntitySet="Jugadores" Role="Jugadores" />
+            <End EntitySet="JugadoresAspectos" Role="JugadoresAspectos" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -259,9 +257,7 @@
           </Key>
           <Property Name="IdPuntuacion" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="casillasRecorridasGlobal" Type="Int32" />
-          <Property Name="monedasObtenidasGlobal" Type="Int32" />
           <Property Name="partidasGanadasGlobal" Type="Int32" />
-          <Property Name="monedasActuales" Type="Int32" />
           <Property Name="IdJugador" Type="Int32" />
           <NavigationProperty Name="Jugadores" Relationship="Self.FK_Jugador_Puntuacion" FromRole="Puntuaciones" ToRole="Jugadores" />
         </EntityType>
@@ -456,9 +452,7 @@
               <MappingFragment StoreEntitySet="Puntuaciones">
                 <ScalarProperty Name="IdPuntuacion" ColumnName="IdPuntuacion" />
                 <ScalarProperty Name="casillasRecorridasGlobal" ColumnName="casillasRecorridasGlobal" />
-                <ScalarProperty Name="monedasObtenidasGlobal" ColumnName="monedasObtenidasGlobal" />
                 <ScalarProperty Name="partidasGanadasGlobal" ColumnName="partidasGanadasGlobal" />
-                <ScalarProperty Name="monedasActuales" ColumnName="monedasActuales" />
                 <ScalarProperty Name="IdJugador" ColumnName="IdJugador" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -82,6 +82,8 @@
     <Compile Include="DAOs\CuentaFolder\ICuentaDAO.cs" />
     <Compile Include="DAOs\JugadorFolder\IJugadorDAO.cs" />
     <Compile Include="DAOs\JugadorFolder\JugadorDAO.cs" />
+    <Compile Include="DAOs\PuntuacionFolder\IPuntuacionDAO.cs" />
+    <Compile Include="DAOs\PuntuacionFolder\PuntuacionDAO.cs" />
     <Compile Include="LoginService\ILoginService.cs" />
     <Compile Include="LoginService\LoginService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

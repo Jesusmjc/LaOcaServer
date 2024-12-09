@@ -60,7 +60,19 @@ namespace LaOcaService
         bool CorreoExiste(string correoElectronico);
 
         [OperationContract]
-        bool NombreUsuarioExiste(string nombreUsuario);
+        bool NombreUsuarioExisteCrear(string nombreUsuario);
+
+        [OperationContract]
+        bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual);
+
+        [OperationContract]
+        void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap);
+
+        [OperationContract]
+        string ConsultarEstadisticasJugador(int idJugador);
+
+        [OperationContract]
+        List<Jugador> ObtenerRankingGlobal();
     }
 
     [DataContract]
@@ -106,6 +118,14 @@ namespace LaOcaService
         public bool EsInvitado { get; set; }
 
         [DataMember]
+        public int CasillasRecorridas { get; set; }
+        [DataMember]
+        public int PartidasGanadas { get; set; }
+        [DataMember]
+        public int UltimaPosicion { get; set; }
+        [DataMember]
+        public bool HaLlegadoAMeta { get; set; }
+        [DataMember]
         public int IdFotoPerfil { get; set; }
 
         [DataMember]
@@ -149,6 +169,8 @@ namespace LaOcaService
         {
             Invitaciones = new List<InvitacionPartida>();
             Amistades = new List<Amistad>();
+            CasillasRecorridas = 0;
+            PartidasGanadas = 0;
         }
 
         public override bool Equals(object obj)
@@ -174,6 +196,74 @@ namespace LaOcaService
     }
 
     [DataContract]
+    public class JugadorException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public JugadorException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public JugadorException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+    [DataContract]
+    public class CuentaException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public CuentaException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public CuentaException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+    [DataContract]
+    public class AspectoException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public AspectoException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public AspectoException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+    [DataContract]
+    public class PuntuacionException
+    {
+        [DataMember]
+        public string Mensaje { get; set; }
+
+        public PuntuacionException()
+        {
+            Mensaje = "Error en la operación";
+        }
+
+        public PuntuacionException(string mensaje)
+        {
+            Mensaje = mensaje;
+        }
+    }
+
+        [DataContract]
     public class Aspecto
     {
         [DataMember]

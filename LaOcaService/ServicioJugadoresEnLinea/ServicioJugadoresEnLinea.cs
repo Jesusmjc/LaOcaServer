@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
+using log4net;
 
 namespace LaOcaService
 {
     public partial class LaOcaService : IServicioJugadoresEnLinea
     {
         public static Dictionary<string, Jugador> listaJugadoresConectados = new Dictionary<string, Jugador>();
-        
+
+        private static readonly ILog _loggerJugadoresEnLinea = LogManager.GetLogger(typeof(IServicioJugadoresEnLinea));
+
         public int AgregarJugadorConectado(Jugador nuevoJugadorConectado)
         {
             int resultado = 0;
@@ -24,7 +27,18 @@ namespace LaOcaService
                 {
                     foreach (var parJugador in listaJugadoresConectados)
                     {
-                        parJugador.Value.CanalCallbackJugadoresEnLinea?.MostrarNuevoJugadorConectado(nuevoJugadorConectado);
+                        try
+                        {
+                            parJugador.Value.CanalCallbackJugadoresEnLinea?.MostrarNuevoJugadorConectado(nuevoJugadorConectado);
+                        }
+                        catch (CommunicationException ex)
+                        {
+                            _loggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        }
+                        catch (TimeoutException ex)
+                        {
+                            _loggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                        }
                     }
                 }
             }
@@ -44,7 +58,18 @@ namespace LaOcaService
                     {
                         if (!parJugador.Key.Equals(jugadorDesconectado.NombreUsuario))
                         {
-                            parJugador.Value.CanalCallbackJugadoresEnLinea?.OcultarJugadorDesconectado(jugadorDesconectado);
+                            try
+                            {
+                                parJugador.Value.CanalCallbackJugadoresEnLinea?.OcultarJugadorDesconectado(jugadorDesconectado);
+                            }
+                            catch (CommunicationException ex)
+                            {
+                                _loggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                            }
+                            catch (TimeoutException ex)
+                            {
+                                _loggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                            }
                         }
                     }
                 }

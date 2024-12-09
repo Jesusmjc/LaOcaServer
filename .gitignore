@@ -366,3 +366,5 @@ LaOcaHost/App.config
 LaOcaService/App.config
 LaOcaTests/App.config
 LaOcaDataAccess/App.config
+
+NDependOut/*

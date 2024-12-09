@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -12,6 +13,8 @@ namespace LaOcaService
         public Juego juego;
         private Utilidades _utilidades;
         private Jugador _jugador;
+
+        private static readonly ILog _loggerJugabilidad = LogManager.GetLogger(typeof(IServicioJugabilidad));
 
         public void InicializarJuego()
         {
@@ -144,6 +147,14 @@ namespace LaOcaService
                         try
                         {
                             j.CanalCallbackPartida.ActualizarPosicionFicha(jugador.Ficha.PosicionActual, nombreJugador);
+                        }
+                        catch (CommunicationException ex)
+                        {
+                            _loggerJugabilidad.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        }
+                        catch (TimeoutException ex)
+                        {
+                            _loggerJugabilidad.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                         }
                         catch (Exception ex)
                         {

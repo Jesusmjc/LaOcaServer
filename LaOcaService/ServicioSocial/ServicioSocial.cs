@@ -1,5 +1,6 @@
 ﻿using LaOcaService.DAOs;
 using LaOcaService.DAOs.AmistadFolder;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace LaOcaService
 {
     public partial class LaOcaService : IServicioSocial
     {
+        private static readonly ILog _loggerSocial = LogManager.GetLogger(typeof(IServicioJugadoresEnLinea));
+
         public bool EnviarInvitacionAPartida(string nombreJugador, Jugador jugadorEmisor, string codigoSala)
         {
             bool resultado = false;
@@ -24,7 +27,19 @@ namespace LaOcaService
 
             if (!listaJugadoresConectados[nombreJugador].Invitaciones.Contains(invitacion))
             {
-                listaJugadoresConectados[nombreJugador].CanalCallbackBuzon?.MostrarNuevaInvitacionAPartida(invitacion);
+                try
+                {
+                    listaJugadoresConectados[nombreJugador].CanalCallbackBuzon?.MostrarNuevaInvitacionAPartida(invitacion);
+                }
+                catch (CommunicationException ex)
+                {
+                    _loggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                }
+                catch (TimeoutException ex)
+                {
+                    _loggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                }
+
                 listaJugadoresConectados[nombreJugador].Invitaciones.Add(invitacion);
 
                 resultado = true;
@@ -118,7 +133,18 @@ namespace LaOcaService
                 if (listaJugadoresConectados.ContainsKey(amigoEliminado.NombreUsuario))
                 {
                     amigoEliminado = listaJugadoresConectados[amigoEliminado.NombreUsuario];
-                    amigoEliminado.CanalCallbackJugadoresEnLinea?.OcultarJugadorQueTerminoAmistad(solicitudAmistad.IdJugadorSolicitante);
+                    try
+                    {
+                        amigoEliminado.CanalCallbackJugadoresEnLinea?.OcultarJugadorQueTerminoAmistad(solicitudAmistad.IdJugadorSolicitante);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        _loggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        _loggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    }
                 }
             }
 

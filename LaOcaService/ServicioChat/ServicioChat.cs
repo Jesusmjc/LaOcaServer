@@ -1,4 +1,6 @@
 ﻿using LaOcaDataAccess;
+using LaOcaService.DAOs;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,12 +15,25 @@ namespace LaOcaService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class LaOcaService : IServicioChat
     {
-        
+        private static readonly ILog _loggerChat = LogManager.GetLogger(typeof(IServicioChat));
+
         public void UnirseAlChat(string nombreJugador, string codigoSala)
         {
             if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
             {
-                listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
+                try
+                {
+                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
+                }
+                catch (CommunicationException ex)
+                {
+                    _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                }
+                catch (TimeoutException ex)
+                {
+                    _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                }
+                
             }
 
             EnviarMensaje(nombreJugador, "se ha unido al chat", codigoSala);
@@ -39,11 +54,11 @@ namespace LaOcaService
                     }
                     catch (CommunicationException ex)
                     {
-                        Console.WriteLine($"Error de comunicación con el cliente: {ex.Message}");
+                        _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (TimeoutException ex)
                     {
-                        Console.WriteLine($"El cliente no respondió a tiempo: {ex.Message}");
+                        _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
                     catch (ObjectDisposedException ex)
                     {
@@ -70,7 +85,18 @@ namespace LaOcaService
             {
                 if (amistad.Estado.Equals("Bloqueo"))
                 {
-                    resultado = false;
+                    try
+                    {
+                        resultado = false;
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    }
                 }
             }
 

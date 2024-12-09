@@ -249,7 +249,7 @@ namespace LaOcaService
             var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
             var estadisticas = puntuacionDAO.ObtenerEstadisticasJugador(idJugador);
 
-            return $"Casillas Recorridas: {estadisticas.CasillasRecorridasGlobal}, Partidas Ganadas: {estadisticas.PartidasGanadasGlobal}";
+            return $": {estadisticas.CasillasRecorridasGlobal}, : {estadisticas.PartidasGanadasGlobal}";
         }
 
         public List<Jugador> ObtenerRankingGlobal()

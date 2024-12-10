@@ -18,31 +18,7 @@ namespace LaOcaService
         void ModificarCuenta(Cuenta cuenta);
 
         [OperationContract]
-        void ModificarJugador(Jugador jugador);
-
-        [OperationContract]
-        void ModificarAspecto(Aspecto aspecto);
-
-        [OperationContract]
-        Cuenta ObtenerCuentaPorId(int idCuenta);
-
-        [OperationContract]
-        Jugador ObtenerJugadorPorId(int idJugador);
-
-        [OperationContract]
-        void CrearAspecto(Aspecto aspecto);
-
-        [OperationContract]
-        Aspecto ObtenerAspectoPorId(int idAspecto);
-
-        [OperationContract]
-        void EnviarCodigoVerificacion(string correoElectronico);
-
-        [OperationContract]
-        bool VerificarCodigoCrearCuenta(string correo, string codigo);
-
-        [OperationContract]
-        int VerificarCodigoRecuperarContraseña(string correo, string codigo);
+        Cuenta ObtenerCuentaPorId(int idCuenta); 
 
         [OperationContract]
         bool VerificarContraseñaActual(int idCuenta, string contraseñaActual);
@@ -66,13 +42,49 @@ namespace LaOcaService
         bool NombreUsuarioExisteModificar(string nombreUsuario, int idJugadorActual);
 
         [OperationContract]
-        void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap);
+        List<Jugador> ObtenerRankingGlobal();
+    }
+
+    [ServiceContract]
+    public interface IServicioJugador
+    {
+        [OperationContract]
+        void ModificarJugador(Jugador jugador);
+
+        [OperationContract]
+        Jugador ObtenerJugadorPorId(int idJugador);
 
         [OperationContract]
         string ConsultarEstadisticasJugador(int idJugador);
+    }
+
+    [ServiceContract]
+    public interface IServicioAspecto
+    {
+        [OperationContract]
+        void ModificarAspecto(Aspecto aspecto);
 
         [OperationContract]
-        List<Jugador> ObtenerRankingGlobal();
+        void CrearAspecto(Aspecto aspecto);
+
+        [OperationContract]
+        Aspecto ObtenerAspectoPorId(int idAspecto);
+
+        [OperationContract]
+        void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap);
+    }
+
+    [ServiceContract]
+    public interface IServicioCodigo
+    {
+        [OperationContract]
+        void EnviarCodigoVerificacion(string correoElectronico);
+
+        [OperationContract]
+        bool VerificarCodigoCrearCuenta(string correo, string codigo);
+
+        [OperationContract]
+        int VerificarCodigoRecuperarContraseña(string correo, string codigo);
     }
 
     [DataContract]

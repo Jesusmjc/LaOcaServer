@@ -24,7 +24,7 @@ namespace LaOcaService
                 );
             }
 
-            if (listaJugadoresConectados.ContainsKey(jugadorInicioSesion.NombreUsuario))
+            if (_ListaJugadoresConectados.ContainsKey(jugadorInicioSesion.NombreUsuario))
             {
                 throw new FaultException<InicioSesionException>(
                     new InicioSesionException("No puedes iniciar otra sesión."),

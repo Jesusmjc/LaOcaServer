@@ -16,7 +16,7 @@ namespace LaOcaService.DAOs
     public class InicioSesionDAO : IInicioSesionDAO
     {
         private readonly LaOcaBDEntities contexto;
-        private static readonly ILog logger = LogManager.GetLogger(typeof(InicioSesionDAO));
+        private static readonly ILog _LoggerInicioSesionDAO = LogManager.GetLogger(typeof(InicioSesionDAO));
 
         public InicioSesionDAO() {}
 
@@ -52,7 +52,7 @@ namespace LaOcaService.DAOs
                                         | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                         | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al iniciar sesión: ", ex);
+                _LoggerInicioSesionDAO.Error("Ocurrió una excepción al iniciar sesión: ", ex);
 
                 throw new FaultException<InicioSesionException>(
                     new InicioSesionException("Ocurrió un error al conectar con la Base de Datos. "),

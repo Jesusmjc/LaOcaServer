@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LaOcaService
 {
-    public class Utilidades
+    public static class Utilidades
     {
         public const string OCA = "oca";
         public const string PUENTE = "puente";
@@ -20,7 +20,7 @@ namespace LaOcaService
         public const string META = "meta";
         public const string NORMAL = "normal";
 
-        private Dictionary<int, string> casillasEspeciales = new Dictionary<int, string>
+        private static readonly Dictionary<int, string> _casillasEspeciales = new Dictionary<int, string>
         {
             {1, OCA},
             {5, OCA},
@@ -47,12 +47,12 @@ namespace LaOcaService
             {63, META}
         };
 
-        public string VerificarCasillaEspecial(int posicion)
+        public static string VerificarCasillaEspecial(int posicion)
         {
-            return casillasEspeciales.ContainsKey(posicion) ? casillasEspeciales[posicion] : NORMAL;
+            return _casillasEspeciales.ContainsKey(posicion) ? _casillasEspeciales[posicion] : NORMAL;
         }
 
-        public int ObtenerSiguienteOca(int posicionActual)
+        public static int ObtenerSiguienteOca(int posicionActual)
         {
             int[] casillasOca = { 1, 5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59};
             foreach (int casilla in casillasOca)

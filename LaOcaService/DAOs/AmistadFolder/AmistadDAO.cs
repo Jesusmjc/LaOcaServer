@@ -10,12 +10,12 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LaOcaService.DAOs
+namespace LaOcaService.DAOs.AmistadFolder
 {
-    public class AmistadDAO : AmistadFolder.IAmistadDAO
+    public class AmistadDAO : IAmistadDAO
     {
         private readonly LaOcaBDEntities contexto;
-        private static readonly ILog logger = LogManager.GetLogger(typeof(AmistadDAO));
+        private static readonly ILog _LoggerAmistadDAO = LogManager.GetLogger(typeof(AmistadDAO));
 
         public AmistadDAO(LaOcaBDEntities contexto)
         {
@@ -49,7 +49,7 @@ namespace LaOcaService.DAOs
                                          | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                          | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al consultar amistades: ", ex);
+                _LoggerAmistadDAO.Error("Ocurrió una excepción al consultar amistades: ", ex);
 
                 throw new FaultException<AmistadException>(
                     new AmistadException("Ocurrió un error al conectar con la Base de Datos. Por favor intente más tarde."),
@@ -87,14 +87,14 @@ namespace LaOcaService.DAOs
                 }
                 else
                 {
-                    logger.Error("Se intentó guardar una nueva amistad que ya existe.");
+                    _LoggerAmistadDAO.Error("Se intentó guardar una nueva amistad que ya existe.");
                 }
             }
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
                                          | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                          | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al registar una nueva amistad: ", ex);
+                _LoggerAmistadDAO.Error("Ocurrió una excepción al registar una nueva amistad: ", ex);
 
                 throw new FaultException<AmistadException>(
                     new AmistadException("Ocurrió un error al conectar con la Base de Datos. "),
@@ -123,14 +123,14 @@ namespace LaOcaService.DAOs
                 }
                 else
                 {
-                    logger.Error("\nSe intentó actualizar una amistad que no existe. \n");
+                    _LoggerAmistadDAO.Error("\nSe intentó actualizar una amistad que no existe. \n");
                 } 
             }
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
                                          | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                          | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al actualizar una amistad: ", ex);
+                _LoggerAmistadDAO.Error("Ocurrió una excepción al actualizar una amistad: ", ex);
 
                 throw new FaultException<AmistadException>(
                     new AmistadException("Ocurrió un error al conectar con la Base de Datos. "),
@@ -184,7 +184,7 @@ namespace LaOcaService.DAOs
                                          | ex is InvalidOperationException | ex is EntityException | ex is TimeoutException
                                          | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al recuperar las amistades: ", ex);
+                _LoggerAmistadDAO.Error("Ocurrió una excepción al recuperar las amistades: ", ex);
 
                 throw new FaultException<AmistadException>(
                     new AmistadException("Ocurrió un error al conectar con la Base de Datos. "),

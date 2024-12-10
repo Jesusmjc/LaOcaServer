@@ -134,7 +134,7 @@ namespace LaOcaService
         public Dictionary<string, Jugador> Jugadores;
 
         [DataMember]
-        public Partida Partida;
+        public Partida Partida { get; set; }
 
 
         public override bool Equals(object obj)
@@ -163,10 +163,10 @@ namespace LaOcaService
     public class Partida
     {
         [DataMember]
-        public string NombreJugadorEnTurno;
+        public string NombreJugadorEnTurno { get; set; }
 
         [DataMember]
-        public List<string> NombresDeJugadoresEnOrdenDeTurnos;
+        public List<string> NombresDeJugadoresEnOrdenDeTurnos { get; set; }
     }
 
     [DataContract]

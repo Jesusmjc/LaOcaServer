@@ -58,10 +58,10 @@ namespace LaOcaService
     public class InvitacionPartida
     {
         [DataMember]
-        public Jugador JugadorEmisor;
+        public Jugador JugadorEmisor { get; set; }
 
         [DataMember]
-        public string CodigoSalaObjetivo;
+        public string CodigoSalaObjetivo { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -86,19 +86,19 @@ namespace LaOcaService
     public class Amistad
     {
         [DataMember]
-        public int IdAmistad;
+        public int IdAmistad { get; set; }
 
         [DataMember]
-        public string Estado; // 'Solicitud', 'Amigos', 'Bloqueo', 'Rechazada'
+        public string Estado { get; set; } // 'Solicitud', 'Amigos', 'Bloqueo', 'Rechazada'
 
         [DataMember]
-        public int IdJugadorSolicitante;
+        public int IdJugadorSolicitante { get; set; }
 
         [DataMember]
-        public int IdJugadorReceptor;
+        public int IdJugadorReceptor { get; set; }
 
         [DataMember]
-        public DateTime Fecha;
+        public DateTime Fecha { get; set; }
 
         public override bool Equals(object obj)
         {

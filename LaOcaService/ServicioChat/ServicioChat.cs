@@ -15,23 +15,23 @@ namespace LaOcaService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class LaOcaService : IServicioChat
     {
-        private static readonly ILog _loggerChat = LogManager.GetLogger(typeof(IServicioChat));
+        private static readonly ILog _LoggerChat = LogManager.GetLogger(typeof(IServicioChat));
 
         public void UnirseAlChat(string nombreJugador, string codigoSala)
         {
-            if (listaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
+            if (_ListaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
             {
                 try
                 {
-                    listaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
+                    _ListaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackChat = OperationContext.Current.GetCallbackChannel<IChatCallback>();
                 }
                 catch (CommunicationException ex)
                 {
-                    _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                    _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                 }
                 catch (TimeoutException ex)
                 {
-                    _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    _LoggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                 }
                 
             }
@@ -41,7 +41,7 @@ namespace LaOcaService
 
         public void EnviarMensaje(string nombreJugador, string mensaje, string codigoSala)
         {
-            foreach (var cliente in listaSalasActivas[codigoSala].Jugadores)
+            foreach (var cliente in _ListaSalasActivas[codigoSala].Jugadores)
             {
                 if (!cliente.Value.NombreUsuario.Equals(nombreJugador))
                 {
@@ -54,11 +54,11 @@ namespace LaOcaService
                     }
                     catch (CommunicationException ex)
                     {
-                        _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (TimeoutException ex)
                     {
-                        _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                        _LoggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
                     catch (ObjectDisposedException ex)
                     {
@@ -76,8 +76,8 @@ namespace LaOcaService
         {
             bool resultado = true;
 
-            Jugador jugadorReceptor = listaJugadoresConectados[nombreJugadorReceptor];
-            Jugador jugadorEmisor = listaJugadoresConectados[nombreJugadorEmisor];
+            Jugador jugadorReceptor = _ListaJugadoresConectados[nombreJugadorReceptor];
+            Jugador jugadorEmisor = _ListaJugadoresConectados[nombreJugadorEmisor];
 
             Amistad amistad = RecuperarAmistad(jugadorEmisor.IdJugador, jugadorReceptor.IdJugador);
 
@@ -91,11 +91,11 @@ namespace LaOcaService
                     }
                     catch (CommunicationException ex)
                     {
-                        _loggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (TimeoutException ex)
                     {
-                        _loggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                        _LoggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
                 }
             }

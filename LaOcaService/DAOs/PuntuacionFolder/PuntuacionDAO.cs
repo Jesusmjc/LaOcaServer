@@ -13,7 +13,7 @@ namespace LaOcaService.DAOs.PuntuacionFolder
     public class PuntuacionDAO : IPuntuacionDAO
     {
         private readonly LaOcaBDEntities contexto;
-        private static readonly ILog logger = LogManager.GetLogger(typeof(PuntuacionDAO));
+        private static readonly ILog _LoggerPuntuacionDAO = LogManager.GetLogger(typeof(PuntuacionDAO));
 
         public PuntuacionDAO(LaOcaBDEntities contexto)
         {
@@ -39,14 +39,14 @@ namespace LaOcaService.DAOs.PuntuacionFolder
                 }
 
                 contexto.SaveChanges();
-                logger.Info($"Estadísticas actualizadas para el jugador con ID: {idJugador}. " +
+                _LoggerPuntuacionDAO.Info($"Estadísticas actualizadas para el jugador con ID: {idJugador}. " +
                             $"Casillas recorridas: {puntuacion.casillasRecorridasGlobal}, Partidas ganadas: {puntuacion.partidasGanadasGlobal}");
             }
             catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
                                        ex is InvalidOperationException || ex is EntityException ||
                                        ex is TimeoutException || ex is DbEntityValidationException)
             {
-                logger.Error("Error al actualizar estadísticas del jugador: ", ex);
+                _LoggerPuntuacionDAO.Error("Error al actualizar estadísticas del jugador: ", ex);
                 throw new FaultException<PuntuacionException>(
                     new PuntuacionException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")
@@ -74,7 +74,7 @@ namespace LaOcaService.DAOs.PuntuacionFolder
                                        ex is InvalidOperationException || ex is EntityException ||
                                        ex is TimeoutException || ex is DbEntityValidationException)
             {
-                logger.Error("Error al obtener estadísticas del jugador: ", ex);
+                _LoggerPuntuacionDAO.Error("Error al obtener estadísticas del jugador: ", ex);
                 throw new FaultException<PuntuacionException>(
                     new PuntuacionException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")
@@ -107,7 +107,7 @@ namespace LaOcaService.DAOs.PuntuacionFolder
                                        ex is InvalidOperationException || ex is EntityException ||
                                        ex is TimeoutException || ex is DbEntityValidationException)
             {
-                logger.Error("Error al obtener el ranking global: ", ex);
+                _LoggerPuntuacionDAO.Error("Error al obtener el ranking global: ", ex);
                 throw new FaultException<PuntuacionException>(
                     new PuntuacionException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")

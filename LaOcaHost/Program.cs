@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LaOcaHost
 {
-    internal class Program
+    sealed internal class Program
     {
         static void Main(string[] args)
         {

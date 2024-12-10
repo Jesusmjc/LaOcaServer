@@ -13,7 +13,7 @@ namespace LaOcaService
 {
     public partial class LaOcaService : IServicioSocial
     {
-        private static readonly ILog _loggerSocial = LogManager.GetLogger(typeof(IServicioJugadoresEnLinea));
+        private static readonly ILog _LoggerSocial = LogManager.GetLogger(typeof(IServicioJugadoresEnLinea));
 
         public bool EnviarInvitacionAPartida(string nombreJugador, Jugador jugadorEmisor, string codigoSala)
         {
@@ -25,22 +25,22 @@ namespace LaOcaService
                 CodigoSalaObjetivo = codigoSala
             };
 
-            if (!listaJugadoresConectados[nombreJugador].Invitaciones.Contains(invitacion))
+            if (!_ListaJugadoresConectados[nombreJugador].Invitaciones.Contains(invitacion))
             {
                 try
                 {
-                    listaJugadoresConectados[nombreJugador].CanalCallbackBuzon?.MostrarNuevaInvitacionAPartida(invitacion);
+                    _ListaJugadoresConectados[nombreJugador].CanalCallbackBuzon?.MostrarNuevaInvitacionAPartida(invitacion);
                 }
                 catch (CommunicationException ex)
                 {
-                    _loggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                    _LoggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                 }
                 catch (TimeoutException ex)
                 {
-                    _loggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    _LoggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                 }
 
-                listaJugadoresConectados[nombreJugador].Invitaciones.Add(invitacion);
+                _ListaJugadoresConectados[nombreJugador].Invitaciones.Add(invitacion);
 
                 resultado = true;
             }
@@ -50,12 +50,12 @@ namespace LaOcaService
 
         public void EliminarInvitacionAPartida(string nombreJugador, InvitacionPartida invitacion)
         {
-            listaJugadoresConectados[nombreJugador].Invitaciones.Remove(invitacion);
+            _ListaJugadoresConectados[nombreJugador].Invitaciones.Remove(invitacion);
         }
 
         public List<InvitacionPartida> RecuperarInvitaciones(string nombreJugador)
         {
-            List<InvitacionPartida> listaInvitaciones = listaJugadoresConectados[nombreJugador].Invitaciones;
+            List<InvitacionPartida> listaInvitaciones = _ListaJugadoresConectados[nombreJugador].Invitaciones;
 
             return listaInvitaciones;
         }
@@ -79,7 +79,7 @@ namespace LaOcaService
                 if (resultado > 0)
                 {
                     nuevaAmistad.IdAmistad = resultado;
-                    listaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
+                    _ListaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace LaOcaService
                     nuevaAmistad.IdAmistad = amistadExistente.IdAmistad;
                     amistadDAO.ActualizarEstadoAmistad(nuevaAmistad);
 
-                    listaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
+                    _ListaJugadoresConectados[nombreJugadorReceptor].Amistades.Add(nuevaAmistad);
                 }
                 else if (amistadExistente.Estado.Equals("Amigos"))
                 {
@@ -130,20 +130,20 @@ namespace LaOcaService
             if (estadoPrevio.Equals("Amigos") && (nuevoEstado.Equals("Rechazada") || nuevoEstado.Equals("Bloqueo")))
             {
                 Jugador amigoEliminado = ObtenerJugadorPorId(solicitudAmistad.IdJugadorReceptor);
-                if (listaJugadoresConectados.ContainsKey(amigoEliminado.NombreUsuario))
+                if (_ListaJugadoresConectados.ContainsKey(amigoEliminado.NombreUsuario))
                 {
-                    amigoEliminado = listaJugadoresConectados[amigoEliminado.NombreUsuario];
+                    amigoEliminado = _ListaJugadoresConectados[amigoEliminado.NombreUsuario];
                     try
                     {
                         amigoEliminado.CanalCallbackJugadoresEnLinea?.OcultarJugadorQueTerminoAmistad(solicitudAmistad.IdJugadorSolicitante);
                     }
                     catch (CommunicationException ex)
                     {
-                        _loggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        _LoggerSocial.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (TimeoutException ex)
                     {
-                        _loggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                        _LoggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
                 }
             }
@@ -178,7 +178,7 @@ namespace LaOcaService
     {
         public void AgregarCanalCallbackBuzon(string nombreJugador)
         {
-            listaJugadoresConectados[nombreJugador].CanalCallbackBuzon = OperationContext.Current.GetCallbackChannel<IBuzonCallback>();
+            _ListaJugadoresConectados[nombreJugador].CanalCallbackBuzon = OperationContext.Current.GetCallbackChannel<IBuzonCallback>();
         }
     }
 }

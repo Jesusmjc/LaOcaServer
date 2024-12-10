@@ -13,7 +13,7 @@ namespace LaOcaService.DAOs.AspectoFolder
     public class AspectoDAO : IAspectoDAO
     {
         private readonly LaOcaBDEntities contexto;
-        private static readonly ILog logger = LogManager.GetLogger(typeof(AspectoDAO));
+        private static readonly ILog _LoggerAspectoDAO = LogManager.GetLogger(typeof(AspectoDAO));
 
         public AspectoDAO(LaOcaBDEntities contexto)
         {
@@ -34,12 +34,12 @@ namespace LaOcaService.DAOs.AspectoFolder
                 contexto.Aspectos.Add(aspectoBD);
                 contexto.SaveChanges();
 
-                logger.Info($"Aspecto creado con ID: {aspecto.IdAspecto}");
+                _LoggerAspectoDAO.Info($"Aspecto creado con ID: {aspecto.IdAspecto}");
             }
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
                                          | ex is EntityException | ex is TimeoutException | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al crear un aspecto: ", ex);
+                _LoggerAspectoDAO.Error("Ocurrió una excepción al crear un aspecto: ", ex);
                 throw new FaultException<AspectoException>(
                     new AspectoException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")
@@ -54,11 +54,11 @@ namespace LaOcaService.DAOs.AspectoFolder
                 var aspectoBD = contexto.Aspectos.FirstOrDefault(a => a.IdAspecto == idAspecto);
                 if (aspectoBD == null)
                 {
-                    logger.Warn($"Aspecto no encontrado con ID: {idAspecto}");
+                    _LoggerAspectoDAO.Warn($"Aspecto no encontrado con ID: {idAspecto}");
                     throw new KeyNotFoundException($"Aspecto con ID {idAspecto} no encontrado.");
                 }
 
-                logger.Info($"Aspecto encontrado con ID: {idAspecto}");
+                _LoggerAspectoDAO.Info($"Aspecto encontrado con ID: {idAspecto}");
                 return new Aspecto
                 {
                     IdAspecto = aspectoBD.IdAspecto,
@@ -69,7 +69,7 @@ namespace LaOcaService.DAOs.AspectoFolder
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
                                          | ex is EntityException | ex is TimeoutException | ex is DbEntityValidationException)
             {
-                logger.Error("Ocurrió una excepción al obtener un aspecto por ID: ", ex);
+                _LoggerAspectoDAO.Error("Ocurrió una excepción al obtener un aspecto por ID: ", ex);
                 throw new FaultException<AspectoException>(
                     new AspectoException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")
@@ -84,7 +84,7 @@ namespace LaOcaService.DAOs.AspectoFolder
                 var aspectoBD = contexto.Aspectos.Find(aspecto.IdAspecto);
                 if (aspectoBD == null)
                 {
-                    logger.Warn($"Intento de modificar un aspecto inexistente con ID: {aspecto.IdAspecto}");
+                    _LoggerAspectoDAO.Warn($"Intento de modificar un aspecto inexistente con ID: {aspecto.IdAspecto}");
                     throw new KeyNotFoundException($"Aspecto con ID {aspecto.IdAspecto} no encontrado.");
                 }
 
@@ -92,7 +92,7 @@ namespace LaOcaService.DAOs.AspectoFolder
                 aspectoBD.tipo = aspecto.Tipo;
                 contexto.SaveChanges();
 
-                logger.Info($"Aspecto con ID: {aspecto.IdAspecto} modificado exitosamente.");
+                _LoggerAspectoDAO.Info($"Aspecto con ID: {aspecto.IdAspecto} modificado exitosamente.");
             }
             catch (DbEntityValidationException ex)
             {
@@ -100,7 +100,7 @@ namespace LaOcaService.DAOs.AspectoFolder
                 {
                     foreach (var validationError in validationErrors.ValidationErrors)
                     {
-                        logger.Error($"Property: {validationError.PropertyName}, Error: {validationError.ErrorMessage}");
+                        _LoggerAspectoDAO.Error($"Property: {validationError.PropertyName}, Error: {validationError.ErrorMessage}");
                     }
                 }
 
@@ -112,7 +112,7 @@ namespace LaOcaService.DAOs.AspectoFolder
             catch (Exception ex) when (ex is SqlException | ex is EntityCommandExecutionException | ex is InvalidOperationException
                                          | ex is EntityException | ex is TimeoutException)
             {
-                logger.Error("Ocurrió una excepción al modificar un aspecto: ", ex);
+                _LoggerAspectoDAO.Error("Ocurrió una excepción al modificar un aspecto: ", ex);
                 throw new FaultException<AspectoException>(
                     new AspectoException("Ocurrió un error al conectar con la Base de Datos."),
                     new FaultReason("Error interno del servidor.")

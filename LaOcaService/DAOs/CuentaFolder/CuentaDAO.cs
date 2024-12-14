@@ -25,6 +25,22 @@ namespace LaOcaService.DAOs.CuentaFolder
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(cuenta.CorreoElectronico))
+                {
+                    throw new FaultException<CuentaException>(
+                        new CuentaException("El campo 'CorreoElectronico' es requerido."),
+                        new FaultReason("Datos inválidos.")
+                    );
+                }
+
+                if (string.IsNullOrWhiteSpace(cuenta.Contrasena))
+                {
+                    throw new FaultException<CuentaException>(
+                        new CuentaException("El campo 'Contrasena' es requerido."),
+                        new FaultReason("Datos inválidos.")
+                    );
+                }
+
                 var cuentaBD = new Cuentas
                 {
                     correoElectronico = cuenta.CorreoElectronico,
@@ -50,7 +66,6 @@ namespace LaOcaService.DAOs.CuentaFolder
                 );
             }
         }
-
 
         public void ModificarCuenta(Cuenta cuenta)
         {

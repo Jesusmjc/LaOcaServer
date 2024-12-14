@@ -24,6 +24,26 @@ namespace LaOcaService.DAOs.AspectoFolder
         {
             try
             {
+                var errores = new List<string>();
+
+                if (string.IsNullOrWhiteSpace(aspecto.Tipo))
+                {
+                    errores.Add("El campo 'Tipo' es requerido.");
+                }
+
+                if (string.IsNullOrWhiteSpace(aspecto.Referencia))
+                {
+                    errores.Add("El campo 'Referencia' es requerido.");
+                }
+
+                if (errores.Any())
+                {
+                    throw new FaultException<AspectoException>(
+                        new AspectoException(string.Join(" ", errores)),
+                        new FaultReason("Datos inválidos.")
+                    );
+                }
+
                 var aspectoBD = new Aspectos
                 {
                     IdAspecto = aspecto.IdAspecto,

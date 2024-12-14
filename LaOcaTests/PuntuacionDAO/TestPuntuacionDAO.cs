@@ -4,6 +4,7 @@ using Xunit;
 using LaOcaDataAccess;
 using LaOcaService.DAOs.PuntuacionFolder;
 using System.Data.Entity;
+using System.Collections.Generic;
 
 namespace LaOcaTests.PuntuacionDAO
 {
@@ -46,7 +47,7 @@ namespace LaOcaTests.PuntuacionDAO
         }
 
         [Fact]
-        public void PruebaActualizarEstadisticasJugador()
+        public void PruebaActualizarEstadisticasJugadorExitoso()
         {
             _puntuacionDAO.ActualizarEstadisticasJugador(_idJugadorPrueba, 5, true);
 
@@ -58,7 +59,14 @@ namespace LaOcaTests.PuntuacionDAO
         }
 
         [Fact]
-        public void PruebaObtenerEstadisticasJugador()
+        public void PruebaActualizarEstadisticasJugadorFallido()
+        {
+            var ex = Assert.Throws<KeyNotFoundException>(() => _puntuacionDAO.ActualizarEstadisticasJugador(-1, 5, true)); // ID inexistente
+            Assert.Contains("No se encontró una puntuación asociada al jugador con ID -1.", ex.Message);
+        }
+
+        [Fact]
+        public void PruebaObtenerEstadisticasJugadorExitoso()
         {
             var estadisticas = _puntuacionDAO.ObtenerEstadisticasJugador(_idJugadorPrueba);
 
@@ -67,11 +75,31 @@ namespace LaOcaTests.PuntuacionDAO
         }
 
         [Fact]
-        public void PruebaObtenerRankingGlobal()
+        public void PruebaObtenerEstadisticasJugadorFallido()
+        {
+            var ex = Assert.Throws<KeyNotFoundException>(() => _puntuacionDAO.ObtenerEstadisticasJugador(-1)); // ID inexistente
+            Assert.Contains("No se encontró una puntuación asociada al jugador con ID -1.", ex.Message);
+        }
+
+        [Fact]
+        public void PruebaObtenerRankingGlobalExitoso()
         {
             var ranking = _puntuacionDAO.ObtenerRankingGlobal();
 
             Assert.Contains(ranking, r => r.IdJugador == _idJugadorPrueba);
+        }
+
+        [Fact]
+        public void PruebaObtenerRankingGlobalFallido()
+        {
+            _contexto.Amistades.RemoveRange(_contexto.Amistades); 
+            _contexto.SaveChanges();
+
+            _contexto.Puntuaciones.RemoveRange(_contexto.Puntuaciones);
+            _contexto.SaveChanges();
+
+            var ranking = _puntuacionDAO.ObtenerRankingGlobal();
+            Assert.Empty(ranking);
         }
 
         public void Dispose()

@@ -5,6 +5,7 @@ using LaOcaService.DAOs.JugadorFolder;
 using LaOcaService;
 using System.Linq;
 using System.Data.Entity;
+using System.Collections.Generic;
 
 namespace LaOcaTests.JugadorDAO
 {
@@ -54,7 +55,7 @@ namespace LaOcaTests.JugadorDAO
         }
 
         [Fact]
-        public void PruebaCrearJugador()
+        public void PruebaCrearJugadorExitoso()
         {
             var nuevoJugador = new Jugador
             {
@@ -71,7 +72,22 @@ namespace LaOcaTests.JugadorDAO
         }
 
         [Fact]
-        public void PruebaModificarJugador()
+        public void PruebaCrearJugadorFallido()
+        {
+            var nuevoJugador = new Jugador
+            {
+                NombreUsuario = "usuarioInvalido",
+                IdCuenta = -1,
+                IdFotoPerfil = 2,
+                IdPuntuacion = 2
+            };
+
+            var ex = Assert.Throws<KeyNotFoundException>(() => _jugadorDAO.CrearJugador(nuevoJugador, "imagenInvalida.jpg"));
+            Assert.Contains("La cuenta con id -1 no existe.", ex.Message);
+        }
+
+        [Fact]
+        public void PruebaModificarJugadorExitoso()
         {
             var jugador = new Jugador
             {
@@ -87,23 +103,60 @@ namespace LaOcaTests.JugadorDAO
         }
 
         [Fact]
-        public void PruebaObtenerJugadorPorId()
+        public void PruebaModificarJugadorFallido()
+        {
+            var jugadorInexistente = new Jugador
+            {
+                IdJugador = -1,
+                NombreUsuario = "usuarioInexistente",
+                IdFotoPerfil = 1
+            };
+
+            _jugadorDAO.ModificarJugador(jugadorInexistente);
+
+            var jugadorBD = _contexto.Jugadores.Find(-1);
+            Assert.Null(jugadorBD);
+        }
+
+        [Fact]
+        public void PruebaObtenerJugadorPorIdExitoso()
         {
             var jugador = _jugadorDAO.ObtenerJugadorPorId(_idJugadorPrueba);
             Assert.True(jugador != null && jugador.NombreUsuario == "usuarioPrueba");
         }
 
         [Fact]
-        public void PruebaNombreUsuarioExisteCrear()
+        public void PruebaObtenerJugadorPorIdFallido()
+        {
+            var jugador = _jugadorDAO.ObtenerJugadorPorId(-1);
+            Assert.Null(jugador);
+        }
+
+        [Fact]
+        public void PruebaNombreUsuarioExisteCrearExitoso()
         {
             var existe = _jugadorDAO.NombreUsuarioExisteCrear("usuarioPrueba");
             Assert.True(existe);
         }
 
         [Fact]
-        public void PruebaNombreUsuarioExisteModificar()
+        public void PruebaNombreUsuarioExisteCrearFallido()
+        {
+            var existe = _jugadorDAO.NombreUsuarioExisteCrear("usuarioInexistente");
+            Assert.False(existe);
+        }
+
+        [Fact]
+        public void PruebaNombreUsuarioExisteModificarExitoso()
         {
             var existe = _jugadorDAO.NombreUsuarioExisteModificar("usuarioPrueba", _idJugadorPrueba);
+            Assert.False(existe);
+        }
+
+        [Fact]
+        public void PruebaNombreUsuarioExisteModificarFallido()
+        {
+            var existe = _jugadorDAO.NombreUsuarioExisteModificar("usuarioInexistente", _idJugadorPrueba);
             Assert.False(existe);
         }
 

@@ -11,12 +11,12 @@ namespace LaOcaTests.AmistadDAO
     public class TestAmistadDAOExcepcion
     {
         private readonly LaOcaBDEntities _contexto;
-        private LaOcaService.DAOs.AmistadDAO _amistadDAO;
+        private LaOcaService.DAOs.AmistadFolder.AmistadDAO _amistadDAO;
 
         public TestAmistadDAOExcepcion()
         {
             _contexto = new LaOcaBDEntities();
-            _amistadDAO = new LaOcaService.DAOs.AmistadDAO(_contexto);
+            _amistadDAO = new LaOcaService.DAOs.AmistadFolder.AmistadDAO(_contexto);
         }
 
         [Fact]

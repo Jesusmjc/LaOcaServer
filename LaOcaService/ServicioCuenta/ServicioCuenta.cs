@@ -203,7 +203,7 @@ namespace LaOcaService
                         var nuevoAspecto = new Aspectos
                         {
                             IdAspecto = idAspecto,
-                            tipo = Utilidades.TIPOFOTOPERFIL,
+                            tipo = Utilidades.TIPO_FOTO_PERFIL,
                             referencia = urlImagen
                         };
                         contexto.Aspectos.Add(nuevoAspecto);

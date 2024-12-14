@@ -20,9 +20,9 @@ namespace LaOcaService
         public const string META = "meta";
         public const string NORMAL = "normal";
 
-        public const string TIPOFOTOPERFIL = "FotoPerfil";
+        public const string TIPO_FOTO_PERFIL = "FotoPerfil";
 
-        private static readonly Dictionary<int, string> _casillasEspeciales = new Dictionary<int, string>
+        private static readonly Dictionary<int, string> _CasillasEspeciales = new Dictionary<int, string>
         {
             {1, OCA},
             {5, OCA},
@@ -51,7 +51,7 @@ namespace LaOcaService
 
         public static string VerificarCasillaEspecial(int posicion)
         {
-            return _casillasEspeciales.ContainsKey(posicion) ? _casillasEspeciales[posicion] : NORMAL;
+            return _CasillasEspeciales.ContainsKey(posicion) ? _CasillasEspeciales[posicion] : NORMAL;
         }
 
         public static int ObtenerSiguienteOca(int posicionActual)

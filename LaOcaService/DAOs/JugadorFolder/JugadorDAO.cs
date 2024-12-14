@@ -164,7 +164,7 @@ namespace LaOcaService.DAOs.JugadorFolder
             var nuevoAspecto = new Aspectos
             {
                 IdAspecto = idFotoPerfil,
-                tipo = Utilidades.TIPOFOTOPERFIL,
+                tipo = Utilidades.TIPO_FOTO_PERFIL,
                 referencia = referenciaImagen
             };
 

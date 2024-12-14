@@ -13,7 +13,7 @@ namespace LaOcaService
     public partial class LaOcaService : IServicioSala
     {
         private static Dictionary<string, Sala> _ListaSalasActivas = new Dictionary<string, Sala>();
-        private static readonly Dictionary<int, string> FichasPorPosicion = new Dictionary<int, string>
+        private static readonly Dictionary<int, string> _FichasPorPosicion = new Dictionary<int, string>
         {
             { 0, "FichaOcaAmarilla" },
             { 1, "FichaOcaAzul" },
@@ -53,7 +53,7 @@ namespace LaOcaService
                 {
                     int posicionJugador = sala.Jugadores.Count;
 
-                    nuevoJugador.FichaAsignada = FichasPorPosicion.ContainsKey(posicionJugador) ? FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
+                    nuevoJugador.FichaAsignada = _FichasPorPosicion.ContainsKey(posicionJugador) ? _FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
 
                     foreach (var jugador in sala.Jugadores)
                     {

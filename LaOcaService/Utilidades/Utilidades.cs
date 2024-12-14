@@ -20,6 +20,8 @@ namespace LaOcaService
         public const string META = "meta";
         public const string NORMAL = "normal";
 
+        public const string TIPOFOTOPERFIL = "FotoPerfil";
+
         private static readonly Dictionary<int, string> _casillasEspeciales = new Dictionary<int, string>
         {
             {1, OCA},

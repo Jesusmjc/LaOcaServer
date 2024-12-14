@@ -110,7 +110,7 @@
     <Compile Include="JugadorDAO\TestJugadorDAO.cs" />
     <Compile Include="JugadorDAO\TestJugadorDAOExcepcion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PuntuacionDAO\TestCuentaDAOExcepcion.cs" />
+    <Compile Include="PuntuacionDAO\TestPuntuacionDAOExcepcion.cs" />
     <Compile Include="PuntuacionDAO\TestPuntuacionDAO.cs" />
   </ItemGroup>
   <ItemGroup>

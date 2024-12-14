@@ -59,7 +59,7 @@ namespace LaOcaTests.CuentaDAO
         {
             var cuentaInvalida = new Cuenta
             {
-                CorreoElectronico = null,
+                CorreoElectronico = "",
                 Contrasena = "sinCorreo",
                 IdJugador = 3
             };

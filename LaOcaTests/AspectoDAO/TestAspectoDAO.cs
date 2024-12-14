@@ -58,7 +58,7 @@ namespace LaOcaTests.AspectoDAO
             var aspectoInvalido = new Aspecto
             {
                 Tipo = "",
-                Referencia = null
+                Referencia = ""
             };
 
             var ex = Assert.Throws<FaultException<AspectoException>>(() => _aspectoDAO.CrearAspecto(aspectoInvalido));
@@ -78,7 +78,7 @@ namespace LaOcaTests.AspectoDAO
         [Fact]
         public void PruebaObtenerAspectoPorIdFallido()
         {
-            var ex = Assert.Throws<KeyNotFoundException>(() => _aspectoDAO.ObtenerAspectoPorId(-1)); // ID inexistente
+            var ex = Assert.Throws<KeyNotFoundException>(() => _aspectoDAO.ObtenerAspectoPorId(-1));
             Assert.Equal("Aspecto con ID -1 no encontrado.", ex.Message);
         }
 

@@ -25,6 +25,8 @@ namespace LaOcaService
 
                 if (!nuevoJugadorConectado.EsInvitado)
                 {
+                    List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
                     foreach (var parJugador in _ListaJugadoresConectados)
                     {
                         try
@@ -38,7 +40,13 @@ namespace LaOcaService
                         catch (TimeoutException ex)
                         {
                             _LoggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                            listaJugadoresADesconectar.Add(parJugador.Value);
                         }
+                    }
+
+                    if (listaJugadoresADesconectar.Count > 0)
+                    {
+                        ManejarDesconexionInesperadaDeJugadoresEnLinea(listaJugadoresADesconectar);
                     }
                 }
             }
@@ -54,6 +62,8 @@ namespace LaOcaService
 
                 if (!jugadorDesconectado.EsInvitado)
                 {
+                    List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
                     foreach (var parJugador in _ListaJugadoresConectados)
                     {
                         if (!parJugador.Key.Equals(jugadorDesconectado.NombreUsuario))
@@ -69,8 +79,14 @@ namespace LaOcaService
                             catch (TimeoutException ex)
                             {
                                 _LoggerJugadoresEnLinea.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                                listaJugadoresADesconectar.Add(parJugador.Value);
                             }
                         }
+                    }
+
+                    if (listaJugadoresADesconectar.Count > 0)
+                    {
+                        ManejarDesconexionInesperadaDeJugadoresEnLinea(listaJugadoresADesconectar);
                     }
                 }
             }
@@ -86,6 +102,30 @@ namespace LaOcaService
             }
 
             return jugadoresConectados;
+        }
+
+        private void ManejarDesconexionInesperadaDeJugadoresEnLinea(List<Jugador> listaJugadoresADesconectar)
+        {
+            foreach (var jugador in listaJugadoresADesconectar)
+            {
+                _ListaJugadoresConectados.Remove(jugador.NombreUsuario);
+            }
+
+            foreach (var parJugador in _ListaJugadoresConectados)
+            {
+                try
+                {
+                    parJugador.Value.CanalCallbackJugadoresEnLinea?.OcultarJugadorDesconectado(parJugador.Value);
+                }
+                catch (TimeoutException ex)
+                {
+                    _LoggerSala.Error("Error al comunicarse con un cliente cuando se avisaba de la desconexión inesperada de otro cliente. La conexión tardó demasiado.", ex);
+                }
+                catch (CommunicationException ex)
+                {
+                    _LoggerSala.Error("Error al comunicarse con un cliente cuando se avisaba de la desconexión inesperada de otro cliente. El cliente se desconectó de forma inesperada.", ex);
+                }
+            }
         }
     }
 

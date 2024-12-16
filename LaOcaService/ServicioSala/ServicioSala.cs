@@ -51,8 +51,9 @@ namespace LaOcaService
 
                 if (!sala.Jugadores.ContainsKey(nuevoJugador.NombreUsuario) && sala.Jugadores.Count < 4)
                 {
-                    int posicionJugador = sala.Jugadores.Count;
+                    List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
 
+                    int posicionJugador = sala.Jugadores.Count;
                     nuevoJugador.FichaAsignada = FichasPorPosicion.ContainsKey(posicionJugador) ? FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
 
                     foreach (var jugador in sala.Jugadores)
@@ -61,18 +62,23 @@ namespace LaOcaService
                         {
                             jugador.Value.CanalCallbackSala.MostrarNuevoJugadorEnSala(nuevoJugador);
                         }
-                        catch (CommunicationException ex)
-                        {
-                            _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                        }
                         catch (TimeoutException ex)
                         {
                             _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                         }
+                        catch (CommunicationException ex)
+                        {
+                            _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                            listaJugadoresADesconectar.Add(jugador.Value);
+                        }
+                    }
+
+                    if (listaJugadoresADesconectar.Count > 0)
+                    {
+                        ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
                     }
 
                     nuevoJugador.CanalCallbackSala = OperationContext.Current.GetCallbackChannel<ISalaCallback>();
-
                     sala.Jugadores.Add(nuevoJugador.NombreUsuario, nuevoJugador);
 
                     resultado = 1;
@@ -92,6 +98,7 @@ namespace LaOcaService
 
             if (_ListaSalasActivas.ContainsKey(codigoSala))
             {
+                List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
                 _ListaSalasActivas[codigoSala].Partida = nuevaPartida;
 
                 foreach (var parJugador in _ListaSalasActivas[codigoSala].Jugadores)
@@ -102,15 +109,21 @@ namespace LaOcaService
                         {
                             parJugador.Value.CanalCallbackSala.MostrarVentanaDePartida(nuevaPartida);
                         }
-                        catch (CommunicationException ex)
-                        {
-                            _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                        }
                         catch (TimeoutException ex)
                         {
                             _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                         }
+                        catch (CommunicationException ex)
+                        {
+                            _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                            listaJugadoresADesconectar.Add(parJugador.Value);
+                        }
                     }
+                }
+
+                if (listaJugadoresADesconectar.Count > 0)
+                {
+                    ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
                 }
             }
             return nuevaPartida;
@@ -123,6 +136,32 @@ namespace LaOcaService
             List<string> nombresDeJugadoresEnOrdenDeTurnos = sala.Jugadores.Keys.OrderBy(key => random.Next()).ToList();
 
             return nombresDeJugadoresEnOrdenDeTurnos;
+        }
+
+        private void ManejarDesconexionInesperadaDeJugadoresEnSala(string codigoSala, List<Jugador> listaJugadoresADesconectar)
+        {
+            foreach (var jugador in listaJugadoresADesconectar)
+            {
+                _ListaSalasActivas[codigoSala].Jugadores.Remove(jugador.NombreUsuario);
+            }
+
+            foreach (var parJugador in _ListaSalasActivas[codigoSala].Jugadores)
+            {
+                try
+                {
+                    parJugador.Value.CanalCallbackJugadoresEnSala?.MostrarDesconexionJugador(parJugador.Key);
+                }
+                catch (TimeoutException ex)
+                {
+                    _LoggerSala.Error("Error al comunicarse con un cliente cuando se avisaba de la desconexión inesperada de otro cliente. La conexión tardó demasiado.", ex);
+                }
+                catch (CommunicationException ex)
+                {
+                    _LoggerSala.Error("Error al comunicarse con un cliente cuando se avisaba de la desconexión inesperada de otro cliente. El cliente se desconectó de forma inesperada.", ex);
+                }
+            }
+
+            ManejarDesconexionInesperadaDeJugadoresEnLinea(listaJugadoresADesconectar);
         }
     }
 
@@ -263,13 +302,13 @@ namespace LaOcaService
                     {
                         jugador.CanalCallbackPartida?.MostrarNuevoJugadorEnTurno(nombreSiguienteJugador);
                     }
-                    catch (CommunicationException ex)
-                    {
-                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                    }
                     catch (TimeoutException ex)
                     {
                         _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (Exception ex)
                     {
@@ -352,6 +391,8 @@ namespace LaOcaService
 
         public void NotificarDesconexion(string nombreJugadorDesconectado, string codigoSala)
         {
+            List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
             Sala salaObjetivo = _ListaSalasActivas[codigoSala];
             salaObjetivo.Jugadores.Remove(nombreJugadorDesconectado);
 
@@ -361,20 +402,27 @@ namespace LaOcaService
                 {
                     parJugador.Value.CanalCallbackJugadoresEnSala.MostrarDesconexionJugador(nombreJugadorDesconectado);
                 }
-                catch (CommunicationException ex)
-                {
-                    _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                }
                 catch (TimeoutException ex)
                 {
                     _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                 }
+                catch (CommunicationException ex)
+                {
+                    _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                    listaJugadoresADesconectar.Add(parJugador.Value);
+                }
+            }
+
+            if (listaJugadoresADesconectar.Count > 0)
+            {
+                ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
             }
         }
 
         public void EliminarSala(string codigoSala)
         {
             Sala salaObjetivo = _ListaSalasActivas[codigoSala];
+            List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
 
             foreach (var parJugador in salaObjetivo.Jugadores)
             {
@@ -384,15 +432,21 @@ namespace LaOcaService
                     {
                         parJugador.Value.CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión ha abandonado la sala. Regresarás al Menú Principal.");
                     }
-                    catch (CommunicationException ex)
-                    {
-                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                    }
                     catch (TimeoutException ex)
                     {
                         _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
+                    catch (CommunicationException ex)
+                    {
+                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        listaJugadoresADesconectar.Add(parJugador.Value);
+                    }
                 }
+            }
+
+            if (listaJugadoresADesconectar.Count > 0)
+            {
+                ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
             }
 
             _ListaSalasActivas.Remove(codigoSala);
@@ -404,6 +458,8 @@ namespace LaOcaService
             salaObjetivo.Jugadores[nombreJugador].CanalCallbackJugadoresEnSala.ExpulsarAMenúPrincipal("El anfitrión te ha expulsado de la sala. Regresarás al Menú Principal");
             salaObjetivo.Jugadores.Remove(nombreJugador);
 
+            List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
             string nombreHost = salaObjetivo.NombreHost;
             foreach (var parJugador in salaObjetivo.Jugadores)
             {
@@ -413,31 +469,45 @@ namespace LaOcaService
                     {
                         parJugador.Value.CanalCallbackJugadoresEnSala?.MostrarDesconexionJugador(nombreJugador);
                     }
-                    catch (CommunicationException ex)
-                    {
-                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                    }
                     catch (TimeoutException ex)
                     {
                         _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
+                    catch (CommunicationException ex)
+                    {
+                        _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        listaJugadoresADesconectar.Add(parJugador.Value);
+                    }
                 }
+            }
+
+            if (listaJugadoresADesconectar.Count > 0)
+            {
+                ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
             }
         }
 
         public void NotificarCambioEnAmistad(string codigoSala, string nombreJugadorEmisor, string nombreJugadorObjetivo)
         {
+            List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
             try
             {
                 _ListaSalasActivas[codigoSala].Jugadores[nombreJugadorObjetivo].CanalCallbackJugadoresEnSala.ActualizarEstadoAmistad(nombreJugadorEmisor);
             }
-            catch (CommunicationException ex)
-            {
-                _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-            }
             catch (TimeoutException ex)
             {
                 _LoggerSala.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+            }
+            catch (CommunicationException ex)
+            {
+                _LoggerSala.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                listaJugadoresADesconectar.Add(_ListaSalasActivas[codigoSala].Jugadores[nombreJugadorObjetivo]);
+            }
+
+            if (listaJugadoresADesconectar.Count > 0)
+            {
+                ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
             }
         }
     }

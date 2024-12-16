@@ -11,9 +11,20 @@ namespace LaOcaService
     [ServiceContract]
     public interface IServicioJugabilidad
     {
+        /// <summary>
+        /// Actualiza la posición de la ficha del jugador correspondiente,
+        /// y notifica al resto de jugadores en la partida del cambio
+        /// </summary>
+        /// <param name="pasos"> El número de casillas avanzadas por la ficha </param>
+        /// <param name="codigoSala"> El código de la sala en cuestión </param>
+        /// <param name="nombreJugador"> El nombre del jugador que acaba de jugar su turno </param>
         [OperationContract]
         void JugarTurno(int pasos, string codigoSala, string nombreJugador);
 
+        /// <summary>
+        /// Recupera la posición actual de la ficha
+        /// </summary>
+        /// <returns>  La posición actual de la ficha </returns>
         [OperationContract]
         int ObtenerPosicionFicha();
     }

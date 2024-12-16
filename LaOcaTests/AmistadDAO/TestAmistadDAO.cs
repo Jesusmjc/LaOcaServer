@@ -15,7 +15,7 @@ namespace LaOcaTests.AmistadDAO
         private readonly LaOcaBDEntities _contexto;
         private DbContextTransaction _transaccion;
 
-        private LaOcaService.DAOs.AmistadDAO _amistadDAO;
+        private LaOcaService.DAOs.AmistadFolder.AmistadDAO _amistadDAO;
         private int _idAmistad;
         private DateTime _fecha;
         private int _idJugadorSolicitante;
@@ -29,7 +29,7 @@ namespace LaOcaTests.AmistadDAO
         {
             _contexto = new LaOcaBDEntities();
             _transaccion = _contexto.Database.BeginTransaction();
-            _amistadDAO = new LaOcaService.DAOs.AmistadDAO(_contexto);
+            _amistadDAO = new LaOcaService.DAOs.AmistadFolder.AmistadDAO(_contexto);
 
             PrepararBaseDeDatos();
         }
@@ -168,8 +168,10 @@ namespace LaOcaTests.AmistadDAO
             Amistad amistadActualizada = new Amistad
             {
                 IdAmistad = _idAmistad,
-                Estado = "Amigos",
+                Estado = "Solicitud",
                 Fecha = DateTime.Now,
+                IdJugadorReceptor = _idJugadorSolicitante,
+                IdJugadorSolicitante = _idJugadorReceptor
             };
 
             int resultado = _amistadDAO.ActualizarEstadoAmistad(amistadActualizada);

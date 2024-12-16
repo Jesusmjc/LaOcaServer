@@ -11,6 +11,14 @@ namespace LaOcaService
     [ServiceContract]
     internal interface IServicioInicioSesion
     {
+        /// <summary>
+        /// Recupera la información guardada en la base de datos del jugador asociado a la cuenta proporcionada
+        /// </summary>
+        /// <param name="cuentaUsuario"> Correo electrónico y contraseña del jugador intentando inciar sesión </param>
+        /// <returns>
+        /// La información del jugador en caso de que exista una cuenta con las credenciales dadas,
+        /// una excepción personalizada con un mensaje de error en caso contrario
+        /// </returns>
         [OperationContract]
         [FaultContract(typeof(InicioSesionException))]
         Jugador IniciarSesion(Cuenta cuentaUsuario);

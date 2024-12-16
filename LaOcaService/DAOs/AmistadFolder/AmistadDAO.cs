@@ -52,7 +52,7 @@ namespace LaOcaService.DAOs.AmistadFolder
                 _LoggerAmistadDAO.Error("Ocurrió una excepción al consultar amistades: ", ex);
 
                 throw new FaultException<AmistadException>(
-                    new AmistadException("Ocurrió un error al conectar con la Base de Datos. Por favor intente más tarde."),
+                    new AmistadException("Ocurrió un error al conectar con la Base de Datos. "),
                     new FaultReason("Error interno del servidor. ")
                 );
             }

@@ -41,34 +41,37 @@ namespace LaOcaService
 
         public void EnviarMensaje(string nombreJugador, string mensaje, string codigoSala)
         {
-            foreach (var cliente in _ListaSalasActivas[codigoSala].Jugadores)
+            List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+            foreach (var jugador in _ListaSalasActivas[codigoSala].Jugadores)
             {
-                if (!cliente.Value.NombreUsuario.Equals(nombreJugador))
+                if (!jugador.Value.NombreUsuario.Equals(nombreJugador))
                 {
                     try
                     {
-                        if (ValidarJugadorNoEstaBloqueado(cliente.Value.NombreUsuario, nombreJugador))
+                        if (ValidarJugadorNoEstaBloqueado(jugador.Value.NombreUsuario, nombreJugador))
                         {
-                            cliente.Value.CanalCallbackChat.MostrarMensaje(nombreJugador, mensaje);
+                            jugador.Value.CanalCallbackChat.MostrarMensaje(nombreJugador, mensaje);
                         }
-                    }
-                    catch (CommunicationException ex)
-                    {
-                        _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
                     }
                     catch (TimeoutException ex)
                     {
                         _LoggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
                     }
-                    catch (ObjectDisposedException ex)
+                    catch (CommunicationException ex)
                     {
-                        Console.WriteLine($"El cliente se ha desconectado: {ex.Message}");
+                        _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                        listaJugadoresADesconectar.Add(jugador.Value);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error inesperado al llamar al cliente: {ex.Message}");
                     }
-                } 
+                }
+            }
+
+            if (listaJugadoresADesconectar.Count > 0)
+            {
+                ManejarDesconexionInesperadaDeJugadoresEnSala(codigoSala, listaJugadoresADesconectar);
             }
         }
 
@@ -85,18 +88,7 @@ namespace LaOcaService
             {
                 if (amistad.Estado.Equals("Bloqueo"))
                 {
-                    try
-                    {
-                        resultado = false;
-                    }
-                    catch (CommunicationException ex)
-                    {
-                        _LoggerChat.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
-                    }
-                    catch (TimeoutException ex)
-                    {
-                        _LoggerChat.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
-                    }
+                   resultado = false;
                 }
             }
 

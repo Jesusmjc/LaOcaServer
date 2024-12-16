@@ -27,6 +27,8 @@ namespace LaOcaService
 
             if (!_ListaJugadoresConectados[nombreJugador].Invitaciones.Contains(invitacion))
             {
+                List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
                 try
                 {
                     _ListaJugadoresConectados[nombreJugador].CanalCallbackBuzon?.MostrarNuevaInvitacionAPartida(invitacion);
@@ -38,6 +40,12 @@ namespace LaOcaService
                 catch (TimeoutException ex)
                 {
                     _LoggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                    listaJugadoresADesconectar.Add(_ListaJugadoresConectados[nombreJugador]);
+                }
+
+                if (listaJugadoresADesconectar.Count  > 0)
+                {
+                    ManejarDesconexionInesperadaDeJugadoresEnLinea(listaJugadoresADesconectar);
                 }
 
                 _ListaJugadoresConectados[nombreJugador].Invitaciones.Add(invitacion);
@@ -129,6 +137,8 @@ namespace LaOcaService
 
             if (estadoPrevio.Equals("Amigos") && (nuevoEstado.Equals("Rechazada") || nuevoEstado.Equals("Bloqueo")))
             {
+                List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
+
                 Jugador amigoEliminado = ObtenerJugadorPorId(solicitudAmistad.IdJugadorReceptor);
                 if (_ListaJugadoresConectados.ContainsKey(amigoEliminado.NombreUsuario))
                 {
@@ -144,7 +154,13 @@ namespace LaOcaService
                     catch (TimeoutException ex)
                     {
                         _LoggerSocial.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
+                        listaJugadoresADesconectar.Add(amigoEliminado);
                     }
+                }
+
+                if (listaJugadoresADesconectar.Count > 0)
+                {
+                    ManejarDesconexionInesperadaDeJugadoresEnLinea(listaJugadoresADesconectar);
                 }
             }
 

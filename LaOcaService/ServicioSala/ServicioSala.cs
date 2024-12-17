@@ -56,6 +56,7 @@ namespace LaOcaService
                 {
                     List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
 
+                    int posicionJugador = sala.Jugadores.Count;
                     nuevoJugador.FichaAsignada = _FichasPorPosicion.ContainsKey(posicionJugador) ? _FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
 
                     foreach (var jugador in sala.Jugadores)

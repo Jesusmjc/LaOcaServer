@@ -97,7 +97,7 @@ namespace LaOcaTests.AmistadDAO
         }
 
         [Fact]
-        public void PruebaRecuperarAmistadExitoso() // Los dos jugadores ya tienen una amistad
+        public void PruebaRecuperarAmistadExitoso()
         {
             var amistadEsperada = new Amistad
             {
@@ -114,7 +114,7 @@ namespace LaOcaTests.AmistadDAO
         }
 
         [Fact]
-        public void PruebaRecuperarAmistadFallido() // No hay relación entre los jugadores
+        public void PruebaRecuperarAmistadFallido()
         {
             var amistadEsperada = new Amistad();
 
@@ -124,7 +124,7 @@ namespace LaOcaTests.AmistadDAO
         }
 
         [Fact]
-        public void PruebaRegistrarNuevaAmistadExitoso() // Se crea una nueva amistad "Solicitud"
+        public void PruebaRegistrarNuevaAmistadExitoso()
         {
             Jugadores jugadorSolicitante = new Jugadores();
             Jugadores jugadorReceptor = new Jugadores();
@@ -149,7 +149,7 @@ namespace LaOcaTests.AmistadDAO
         }
 
         [Fact]
-        public void PruebaRegistrarNuevaAmistadFallido() // Ya existe una amistad entre los jugadores
+        public void PruebaRegistrarNuevaAmistadFallido()
         {
             Amistad amistadExistente = new Amistad
             {

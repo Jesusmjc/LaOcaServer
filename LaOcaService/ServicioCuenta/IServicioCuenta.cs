@@ -100,6 +100,12 @@ namespace LaOcaService
         /// <returns> Una lista con los 10 jugadores con las puntuaciones más altas </returns>
         [OperationContract]
         List<Jugador> ObtenerRankingGlobal();
+
+        [OperationContract]
+        bool ProbarConexionConBD();
+
+        [OperationContract]
+        bool ProbarConexionConServidor();
     }
 
     [ServiceContract]

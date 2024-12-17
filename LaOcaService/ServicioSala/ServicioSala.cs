@@ -7,13 +7,16 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity.Core;
+using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 
 namespace LaOcaService
 {
     public partial class LaOcaService : IServicioSala
     {
         private static Dictionary<string, Sala> _ListaSalasActivas = new Dictionary<string, Sala>();
-        private static readonly Dictionary<int, string> FichasPorPosicion = new Dictionary<int, string>
+        private static readonly Dictionary<int, string> _FichasPorPosicion = new Dictionary<int, string>
         {
             { 0, "FichaOcaAmarilla" },
             { 1, "FichaOcaAzul" },
@@ -53,8 +56,7 @@ namespace LaOcaService
                 {
                     List<Jugador> listaJugadoresADesconectar = new List<Jugador>();
 
-                    int posicionJugador = sala.Jugadores.Count;
-                    nuevoJugador.FichaAsignada = FichasPorPosicion.ContainsKey(posicionJugador) ? FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
+                    nuevoJugador.FichaAsignada = _FichasPorPosicion.ContainsKey(posicionJugador) ? _FichasPorPosicion[posicionJugador] : "FichaOcaAmarilla";
 
                     foreach (var jugador in sala.Jugadores)
                     {
@@ -190,6 +192,11 @@ namespace LaOcaService
 
     public partial class LaOcaService : IServicioPartida
     {
+        public bool Ping()
+        {
+            return true; // Si el servidor responde, devuelve verdadero.
+        }
+
         public void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala)
         {
             if (_ListaSalasActivas.ContainsKey(codigoSala))
@@ -217,49 +224,175 @@ namespace LaOcaService
                     {
                         jugador.CanalCallbackPartida?.MovimientoFicha(posicion, nombreJugador);
                     }
-                    catch (Exception ex)
+                    catch (SqlException)
                     {
-                        Console.WriteLine($"Error al notificar movimiento para {jugador.NombreUsuario}: {ex.Message}");
+                        Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
+                    }
+                    catch (EntityException)
+                    {
+                        Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
                     }
                 }
             }
         }
 
-        private void ManejarFinDePartida(Jugador jugador, Sala sala)
+        private void ManejarFinDePartida(Jugador jugadorGanador, Sala sala)
         {
-            jugador.HaLlegadoAMeta = true;
+            jugadorGanador.HaLlegadoAMeta = true;
 
-            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
-            foreach (var jugadorSala in sala.Jugadores.Values)
+            try
             {
-                bool esGanador = jugadorSala.NombreUsuario == jugador.NombreUsuario;
-                if (!jugadorSala.EsInvitado) {
-                    puntuacionDAO.ActualizarEstadisticasJugador(
-                        jugadorSala.IdJugador,
-                        jugadorSala.CasillasRecorridas,
-                        esGanador
-                    );
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                foreach (var jugadorSala in sala.Jugadores.Values)
+                {
+                    bool esGanador = jugadorSala.NombreUsuario == jugadorGanador.NombreUsuario;
+
+                    if (!jugadorSala.EsInvitado)
+                    {
+                        puntuacionDAO.ActualizarEstadisticasJugador(
+                            jugadorSala.IdJugador,
+                            jugadorSala.CasillasRecorridas,
+                            esGanador
+                        );
+                    }
                 }
             }
+            catch (FaultException)
+            {
+                NotificarErrorConOpciones(sala, jugadorGanador.NombreUsuario);
+                return;
+            }
+            catch (EntityException)
+            {
+                NotificarErrorConOpciones(sala, jugadorGanador.NombreUsuario);
+                return;
+            }
 
+            FinalizarPartidaYNotificar(sala, jugadorGanador);
+        }
+
+        public void ReintentarGuardarEstadisticas(string codigoSala, string nombreJugador)
+        {
+            if (_ListaSalasActivas.ContainsKey(codigoSala))
+            {
+                Sala sala = _ListaSalasActivas[codigoSala];
+                Jugador jugador = sala.Jugadores[nombreJugador];
+
+                try
+                {
+                    var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                    puntuacionDAO.ActualizarEstadisticasJugador(
+                        jugador.IdJugador,
+                        jugador.CasillasRecorridas,
+                        jugador.HaLlegadoAMeta
+                    );
+
+                    try
+                    {
+                        jugador.CanalCallbackPartida?.MostrarMensajeExito("Todas las estadísticas se guardaron correctamente.");
+                        FinalizarPartidaYNotificar(sala, jugador);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        _LoggerSala.Error("Error al enviar el callback MostrarMensajeExito", ex);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        _LoggerSala.Error("Timeout al enviar el callback MostrarMensajeExito", ex);
+                    }
+                }
+                catch (FaultException)
+                {
+                    NotificarErrorConOpciones(sala, nombreJugador);
+                }
+                catch (EntityException)
+                {
+                    NotificarErrorConOpciones(sala, nombreJugador);
+                }
+                catch (Exception)
+                {
+                    NotificarErrorConOpciones(sala, nombreJugador);
+                }
+            }
+        }
+
+        private void FinalizarPartidaYNotificar(Sala sala, Jugador jugadorGanador)
+        {
             var jugadoresOrdenados = sala.Jugadores.Values
-            .OrderByDescending(j => j.HaLlegadoAMeta)
-            .ThenByDescending(j => j.HaLlegadoAMeta ? 0 : j.UltimaPosicion)
-            .ThenByDescending(j => j.CasillasRecorridas)
-            .Select(j => new KeyValuePair<string, int>(j.NombreUsuario, j.CasillasRecorridas))
-            .ToArray();
+                .OrderByDescending(j => j.HaLlegadoAMeta)
+                .ThenByDescending(j => j.HaLlegadoAMeta ? 0 : j.UltimaPosicion)
+                .ThenByDescending(j => j.CasillasRecorridas)
+                .Select(j => new KeyValuePair<string, int>(j.NombreUsuario, j.CasillasRecorridas))
+                .ToArray();
 
             _ListaSalasActivas.Remove(sala.Codigo);
 
-            foreach (var jugadorSala in sala.Jugadores.Values)
+            foreach (var jugador in sala.Jugadores.Values)
             {
                 try
                 {
-                    jugadorSala.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+                    Task.Run(() =>
+                    {
+                        jugador.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+                    });
+                }
+                catch (FaultException ex)
+                {
+                    _LoggerSala.Error("Error al notificar fin de partida", ex);
+                }
+                catch (EntityException ex)
+                {
+                    _LoggerSala.Error("Error al notificar fin de partida", ex);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error al notificar victoria a {jugadorSala.NombreUsuario}: {ex.Message}");
+                    _LoggerSala.Error("Error al notificar fin de partida", ex);
+                }
+            }
+        }
+
+        public void FinalizarSinGuardarEstadisticas(string codigoSala, string nombreJugador)
+        {
+            if (_ListaSalasActivas.ContainsKey(codigoSala))
+            {
+                Sala sala = _ListaSalasActivas[codigoSala];
+                Jugador jugador = sala.Jugadores[nombreJugador];
+
+                try
+                {
+                    jugador.CanalCallbackPartida?.MostrarMensajeExito("La partida ha finalizado sin guardar las estadísticas.");
+                    FinalizarPartidaYNotificar(sala, jugador);
+                }
+                catch (CommunicationException ex)
+                {
+                    _LoggerSala.Error("Error al enviar el callback MostrarMensajeExito", ex);
+                }
+                catch (TimeoutException ex)
+                {
+                    _LoggerSala.Error("Timeout al enviar el callback MostrarMensajeExito", ex);
+                }
+            }
+        }
+
+        private void NotificarErrorConOpciones(Sala sala, string nombreJugadorGanador)
+        {
+            foreach (var jugador in sala.Jugadores.Values)
+            {
+                try
+                {
+                    jugador.CanalCallbackPartida?.MostrarOpcionesErrorBD(nombreJugadorGanador);
+                }
+                catch (CommunicationException ex)
+                {
+                    Console.WriteLine($"Error al notificar error BD: {ex.Message}");
+                }
+                catch (TimeoutException ex)
+                {
+                    Console.WriteLine($"Error al notificar error BD: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al notificar error BD: {ex.Message}");
                 }
             }
         }
@@ -323,7 +456,10 @@ namespace LaOcaService
         {
             lock (_ListaSalasActivas)
             {
-                if (!_ListaSalasActivas.ContainsKey(codigoSala)) return;
+                if (!_ListaSalasActivas.ContainsKey(codigoSala))
+                {
+                    return;
+                }
 
                 Sala sala = _ListaSalasActivas[codigoSala];
 
@@ -338,19 +474,50 @@ namespace LaOcaService
                         {
                             jugador.CanalCallbackPartida?.NotificarAbandonoJugador(nombreJugador);
                         }
-                        catch (Exception ex)
+                        catch (SqlException)
                         {
-                            Console.WriteLine($"Error al notificar abandono: {ex.Message}");
+                            Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
+                        }
+                        catch (EntityException)
+                        {
+                            Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
                         }
                     }
 
                     if (sala.Jugadores.Count == 1)
                     {
                         var jugadorRestante = sala.Jugadores.Values.First();
-                        var jugadoresOrdenados = new[] { new KeyValuePair<string, int>(jugadorRestante.NombreUsuario, jugadorRestante.CasillasRecorridas) };
-                        jugadorRestante.CanalCallbackPartida?.MostrarPantallaVictoria(jugadoresOrdenados);
+                        jugadorRestante.HaLlegadoAMeta = true;
 
-                        _ListaSalasActivas.Remove(codigoSala);
+                        try
+                        {
+                            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                            puntuacionDAO.ActualizarEstadisticasJugador(
+                                jugadorRestante.IdJugador,
+                                jugadorRestante.CasillasRecorridas,
+                                jugadorRestante.HaLlegadoAMeta
+                            );
+
+                            jugadorRestante.CanalCallbackPartida?.MostrarMensajeExito("Has ganado la partida por default.");
+                            FinalizarPartidaYNotificar(sala, jugadorRestante);
+                        }
+                        catch (FaultException)
+                        {
+                            NotificarErrorConOpciones(sala, jugadorRestante.NombreUsuario);
+                        }
+                        catch (SqlException)
+                        {
+                            NotificarErrorConOpciones(sala, jugadorRestante.NombreUsuario);
+                        }
+                        catch (EntityException)
+                        {
+                            NotificarErrorConOpciones(sala, jugadorRestante.NombreUsuario);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error inesperado al finalizar partida: {ex.Message}");
+                            NotificarErrorConOpciones(sala, jugadorRestante.NombreUsuario);
+                        }
                     }
                     else if (sala.Partida.NombreJugadorEnTurno == nombreJugador)
                     {
@@ -364,9 +531,13 @@ namespace LaOcaService
                                 {
                                     jugador.CanalCallbackPartida?.MostrarNuevoJugadorEnTurno(sala.Partida.NombreJugadorEnTurno);
                                 }
-                                catch (Exception ex)
+                                catch (SqlException)
                                 {
-                                    Console.WriteLine($"Error al notificar nuevo turno: {ex.Message}");
+                                    Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
+                                }
+                                catch (EntityException)
+                                {
+                                    Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
                                 }
                             }
                         }

@@ -72,8 +72,8 @@ namespace LaOcaTests.AspectoDAO
             Aspecto aspecto = new Aspecto
             {
                 IdAspecto = 999,
-                Tipo = null,
-                Referencia = null
+                Tipo = "",
+                Referencia = ""
             };
 
             var excepcion = Assert.Throws<FaultException<AspectoException>>(() =>

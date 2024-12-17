@@ -87,11 +87,11 @@ namespace LaOcaTests.InicioSesionDAO
         }
 
         [Fact]
-        public void PruebaIniciarSesionFallido() //No existe la cuenta
+        public void PruebaIniciarSesionFallido()
         {
             var jugadorEsperado = new Jugador();
 
-            var cuentaQueNoExiste = new Cuenta() //Esta cuenta no existe en la bd
+            var cuentaQueNoExiste = new Cuenta()
             {
                 CorreoElectronico = "correoejemploinexistente@gmail.com",
                 Contrasena = "96c63e8bf0a1abe4539fd3b6dcd269bfcd27929a4d6a28bcf82195feae5b3324" // Ej3mpl0_Contra53ñ4

@@ -1,6 +1,9 @@
 ﻿using log4net;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core;
+using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -36,35 +39,46 @@ namespace LaOcaService
 
         public void Mover(Ficha ficha, int pasos, List<Casilla> tablero)
         {
-            if (!ValidarPrecondiciones(ficha, tablero))
+            try
             {
-                return;
+                if (!ValidarPrecondiciones(ficha, tablero))
+                {
+                    return;
+                }
+
+                int nuevaPosicion = ficha.PosicionActual + pasos;
+
+                if (nuevaPosicion < 0)
+                {
+                    nuevaPosicion = 1;
+                }
+                else if (nuevaPosicion >= tablero.Count)
+                {
+                    nuevaPosicion = tablero.Count - 1;
+                }
+
+                ficha.PosicionActual = nuevaPosicion;
+
+                if (ficha.PosicionActual >= 0 && ficha.PosicionActual < tablero.Count)
+                {
+                    Casilla casillaActual = tablero[ficha.PosicionActual];
+                    string tipoCasilla = casillaActual.Tipo;
+
+                    MoverFichaSegunCasilla(tipoCasilla, ficha);
+                }
+                else
+                {
+                    _LoggerJugabilidad.Error($"Error: Posición inválida ({ficha.PosicionActual}) después de mover. Verifique la lógica de movimiento.");
+                    Console.WriteLine($"Error: Posición inválida ({ficha.PosicionActual}) después de mover. Verifique la lógica de movimiento.");
+                }
             }
-
-            int nuevaPosicion = ficha.PosicionActual + pasos;
-
-            if (nuevaPosicion < 0)
+            catch (SqlException)
             {
-                nuevaPosicion = 1;
+                Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
             }
-            else if (nuevaPosicion >= tablero.Count)
+            catch (EntityException)
             {
-                nuevaPosicion = tablero.Count - 1;
-            }
-
-            ficha.PosicionActual = nuevaPosicion;
-
-            if (ficha.PosicionActual >= 0 && ficha.PosicionActual < tablero.Count)
-            {
-                Casilla casillaActual = tablero[ficha.PosicionActual];
-                string tipoCasilla = casillaActual.Tipo;
-
-                MoverFichaSegunCasilla(tipoCasilla, ficha);
-            }
-            else
-            {
-                _LoggerJugabilidad.Error($"Error: Posición inválida ({ficha.PosicionActual}) después de mover. Verifique la lógica de movimiento.");
-                Console.WriteLine($"Error: Posición inválida ({ficha.PosicionActual}) después de mover. Verifique la lógica de movimiento.");
+                Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
             }
         }
 
@@ -89,26 +103,37 @@ namespace LaOcaService
 
         private static void MoverFichaSegunCasilla(string tipoCasilla, Ficha ficha)
         {
-            switch (tipoCasilla)
+            try
             {
-                case Utilidades.OCA:
-                    ficha.PosicionActual = Utilidades.ObtenerSiguienteOca(ficha.PosicionActual);
-                    break;
+                switch (tipoCasilla)
+                {
+                    case Utilidades.OCA:
+                        ficha.PosicionActual = Utilidades.ObtenerSiguienteOca(ficha.PosicionActual);
+                        break;
 
-                case Utilidades.PUENTE:
-                    ficha.PosicionActual = ficha.PosicionActual == 6 ? 12 : 6;
-                    break;
+                    case Utilidades.PUENTE:
+                        ficha.PosicionActual = ficha.PosicionActual == 6 ? 12 : 6;
+                        break;
 
-                case Utilidades.LABERINTO:
-                    ficha.PosicionActual = 30;
-                    break;
+                    case Utilidades.LABERINTO:
+                        ficha.PosicionActual = 30;
+                        break;
 
-                case Utilidades.CALAVERA:
-                    ficha.PosicionActual = 1;
-                    break;
+                    case Utilidades.CALAVERA:
+                        ficha.PosicionActual = 1;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
+            }
+            catch (EntityException)
+            {
+                Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
             }
         }
 
@@ -138,17 +163,13 @@ namespace LaOcaService
                         {
                             j.CanalCallbackPartida.ActualizarPosicionFicha(jugador.Ficha.PosicionActual, nombreJugador);
                         }
-                        catch (CommunicationException ex)
+                        catch (SqlException)
                         {
-                            _LoggerJugabilidad.Error("Error al comunicarse con un cliente. El cliente se desconectó de forma inesperada.", ex);
+                            Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
                         }
-                        catch (TimeoutException ex)
+                        catch (EntityException)
                         {
-                            _LoggerJugabilidad.Error("Error al comunicarse con un cliente. La conexión tardó demasiado.", ex);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error al actualizar la posición de ficha para {j.NombreUsuario}: {ex.Message}");
+                            Console.WriteLine("No fue posible conectarse a la base de datos, por favor intente más tarde.");
                         }
                     }
                 }

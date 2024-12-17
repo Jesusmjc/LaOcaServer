@@ -14,6 +14,9 @@ using LaOcaService.DAOs.JugadorFolder;
 using LaOcaService.DAOs.AspectoFolder;
 using LaOcaService.DAOs.PuntuacionFolder;
 using System.ServiceModel;
+using System.Data.Entity.Core;
+using System.Data.Entity.Validation;
+using log4net;
 
 namespace LaOcaService
 {
@@ -22,7 +25,7 @@ namespace LaOcaService
         private readonly ICuentaDAO _cuentaDAO;
         private readonly IJugadorDAO _jugadorDAO;
         private readonly IAspectoDAO _aspectoDAO;
-
+        private static readonly ILog _LoggerCuentaDAO = LogManager.GetLogger(typeof(IServicioJugadoresEnLinea));
         private readonly Dictionary<string, string> _codigosVerificacion = new Dictionary<string, string>();
 
         public LaOcaService()
@@ -59,14 +62,27 @@ namespace LaOcaService
 
         public bool VerificarContraseñaActual(int idCuenta, string contraseñaActual)
         {
-            using (var contexto = new LaOcaBDEntities())
+            try
             {
-                var cuenta = contexto.Cuentas.Find(idCuenta);
-                if (cuenta != null && cuenta.contrasena == contraseñaActual)
+                using (var contexto = new LaOcaBDEntities())
                 {
-                    return true;
+                    var cuenta = contexto.Cuentas.Find(idCuenta);
+                    if (cuenta != null && cuenta.contrasena == contraseñaActual)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+            }
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
             }
         }
 
@@ -78,46 +94,85 @@ namespace LaOcaService
 
         public void SolicitarRecuperacionContrasena(string correoElectronico)
         {
-            var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correoElectronico);
-
-            if (cuenta == null)
+            try
             {
-                throw new KeyNotFoundException("No se encontró una cuenta con ese correo electrónico.");
+                var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correoElectronico);
+
+                if (cuenta == null)
+                {
+                    throw new KeyNotFoundException("No se encontró una cuenta con ese correo electrónico.");
+                }
+                EnviarCodigoVerificacion(correoElectronico);
             }
-            EnviarCodigoVerificacion(correoElectronico);
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
+            }
         }
 
         public void ModificarContraseña(int idCuenta, string nuevaContrasena)
         {
-            using (var contexto = new LaOcaBDEntities())
+            try
             {
-                var cuenta = contexto.Cuentas.Find(idCuenta);
-                if (cuenta == null)
+                using (var contexto = new LaOcaBDEntities())
                 {
-                    throw new KeyNotFoundException("No se encontró la cuenta especificada.");
-                }
+                    var cuenta = contexto.Cuentas.Find(idCuenta);
+                    if (cuenta == null)
+                    {
+                        throw new KeyNotFoundException("No se encontró la cuenta especificada.");
+                    }
 
-                cuenta.contrasena = nuevaContrasena;
-                contexto.SaveChanges();
+                    cuenta.contrasena = nuevaContrasena;
+                    contexto.SaveChanges();
+                }
+            }
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
             }
         }
 
         public Cuenta ObtenerCuentaPorCodigoVerificacion(string codigoVerificacion)
         {
-            var correo = _codigosVerificacion.FirstOrDefault(x => x.Value == codigoVerificacion).Key;
-
-            if (correo == null)
+            try
             {
-                return null;
+                var correo = _codigosVerificacion.FirstOrDefault(x => x.Value == codigoVerificacion).Key;
+
+                if (correo == null)
+                {
+                    return null;
+                }
+
+                var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correo);
+
+                if (cuenta != null)
+                {
+                    _codigosVerificacion.Remove(correo);
+                }
+                return cuenta;
             }
-
-            var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correo);
-
-            if (cuenta != null)
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
             {
-                _codigosVerificacion.Remove(correo);
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
             }
-            return cuenta;
         }
 
         public bool CorreoExiste(string correoElectronico)
@@ -141,13 +196,45 @@ namespace LaOcaService
                 var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
                 return puntuacionDAO.ObtenerRankingGlobal();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
             {
-                Console.WriteLine($"Error al obtener el ranking global: {ex.Message}");
-                throw new FaultException("Error al obtener el ranking global. Por favor, intente de nuevo más tarde.");
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
             }
         }
 
+        public bool ProbarConexionConBD()
+        {
+            try
+            {
+                using (var contexto = new LaOcaBDEntities())
+                {
+                    contexto.Database.Connection.Open();
+                    contexto.Database.Connection.Close();
+                }
+                return true;
+            }
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
+            }
+        }
+
+        public bool ProbarConexionConServidor()
+        {
+            return true;
+        }
     }
 
     public partial class LaOcaService : IServicioJugador
@@ -164,10 +251,23 @@ namespace LaOcaService
 
         public string ConsultarEstadisticasJugador(int idJugador)
         {
-            var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
-            var estadisticas = puntuacionDAO.ObtenerEstadisticasJugador(idJugador);
+            try
+            {
+                var puntuacionDAO = new PuntuacionDAO(new LaOcaBDEntities());
+                var estadisticas = puntuacionDAO.ObtenerEstadisticasJugador(idJugador);
 
-            return $": {estadisticas.CasillasRecorridasGlobal}, : {estadisticas.PartidasGanadasGlobal}";
+                return $": {estadisticas.CasillasRecorridasGlobal}, : {estadisticas.PartidasGanadasGlobal}";
+            }
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
+            }
         }
     }
 
@@ -190,27 +290,40 @@ namespace LaOcaService
 
         public void SincronizarAspectos(Dictionary<string, int> referenciaToIdMap)
         {
-            using (var contexto = new LaOcaBDEntities())
+            try
             {
-                foreach (var referencia in referenciaToIdMap)
+                using (var contexto = new LaOcaBDEntities())
                 {
-                    var idAspecto = referencia.Value;
-                    var urlImagen = referencia.Key;
-
-                    var aspectoExistente = contexto.Aspectos.Find(idAspecto);
-                    if (aspectoExistente == null)
+                    foreach (var referencia in referenciaToIdMap)
                     {
-                        var nuevoAspecto = new Aspectos
-                        {
-                            IdAspecto = idAspecto,
-                            tipo = "FotoPerfil",
-                            referencia = urlImagen
-                        };
-                        contexto.Aspectos.Add(nuevoAspecto);
-                    }
-                }
+                        var idAspecto = referencia.Value;
+                        var urlImagen = referencia.Key;
 
-                contexto.SaveChanges();
+                        var aspectoExistente = contexto.Aspectos.Find(idAspecto);
+                        if (aspectoExistente == null)
+                        {
+                            var nuevoAspecto = new Aspectos
+                            {
+                                IdAspecto = idAspecto,
+                                tipo = Utilidades.TIPO_FOTO_PERFIL,
+                                referencia = urlImagen
+                            };
+                            contexto.Aspectos.Add(nuevoAspecto);
+                        }
+                    }
+
+                    contexto.SaveChanges();
+                }
+            }
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
             }
         }
     }
@@ -263,17 +376,30 @@ namespace LaOcaService
 
         public int VerificarCodigoRecuperarContraseña(string correo, string codigo)
         {
-            if (_codigosVerificacion.TryGetValue(correo, out string codigoAlmacenado) && codigoAlmacenado == codigo)
+            try
             {
-                var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correo);
-
-                if (cuenta != null)
+                if (_codigosVerificacion.TryGetValue(correo, out string codigoAlmacenado) && codigoAlmacenado == codigo)
                 {
-                    _codigosVerificacion.Remove(correo);
-                    return cuenta.IdCuenta;
+                    var cuenta = _cuentaDAO.ObtenerCuentaPorCorreo(correo);
+
+                    if (cuenta != null)
+                    {
+                        _codigosVerificacion.Remove(correo);
+                        return cuenta.IdCuenta;
+                    }
                 }
+                return -1;
             }
-            return -1;
+            catch (Exception ex) when (ex is SqlException || ex is EntityCommandExecutionException ||
+                                       ex is InvalidOperationException || ex is EntityException ||
+                                       ex is TimeoutException || ex is DbEntityValidationException)
+            {
+                _LoggerCuentaDAO.Error("Ocurrió un error inesperado: ", ex);
+                throw new FaultException<CuentaException>(
+                    new CuentaException("Ocurrió un error al conectar con la Base de Datos."),
+                    new FaultReason("Error interno del servidor.")
+                );
+            }
         }
     }
 }

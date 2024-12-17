@@ -22,7 +22,7 @@ namespace LaOcaTests.InicioSesionDAO
         }
 
         [Fact]
-        public void PruebaIniciarSesionExcepcion() // La cuenta sí existe, se apaga la bd
+        public void PruebaIniciarSesionExcepcion()
         {
             var cuentaQueSiExiste = new Cuenta()
             {

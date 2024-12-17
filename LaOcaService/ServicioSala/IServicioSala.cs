@@ -60,6 +60,14 @@ namespace LaOcaService
         [OperationContract(IsOneWay = true)]
         void AbandonarPartida(string nombreJugador, string codigoSala);
 
+        [OperationContract]
+        void ReintentarGuardarEstadisticas(string codigoSala, string nombreJugador);
+
+        [OperationContract]
+        void FinalizarSinGuardarEstadisticas(string codigoSala, string nombreJugador);
+
+        [OperationContract]
+        bool Ping();
     }
 
     public interface IPartidaCallback
@@ -78,6 +86,15 @@ namespace LaOcaService
 
         [OperationContract(IsOneWay = true)]
         void NotificarAbandonoJugador(string nombreJugador);
+
+        [OperationContract(IsOneWay = true)]
+        void MostrarMensajeError(string mensaje);
+
+        [OperationContract(IsOneWay = true)]
+        void MostrarOpcionesErrorBD(string nombreJugadorGanador);
+
+        [OperationContract(IsOneWay = true)]
+        void MostrarMensajeExito(string mensaje);
     }
 
     [ServiceContract(CallbackContract = typeof(IActualizacionJugadoresEnSalaCallback))]

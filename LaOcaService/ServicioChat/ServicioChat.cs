@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace LaOcaService
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public partial class LaOcaService : IServicioChat
     {
         private static readonly ILog _LoggerChat = LogManager.GetLogger(typeof(IServicioChat));

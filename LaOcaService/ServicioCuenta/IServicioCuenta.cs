@@ -43,6 +43,12 @@ namespace LaOcaService
 
         [OperationContract]
         List<Jugador> ObtenerRankingGlobal();
+
+        [OperationContract]
+        bool ProbarConexionConBD();
+
+        [OperationContract]
+        bool ProbarConexionConServidor();
     }
 
     [ServiceContract]

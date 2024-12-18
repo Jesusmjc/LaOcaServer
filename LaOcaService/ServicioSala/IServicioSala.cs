@@ -121,6 +121,9 @@ namespace LaOcaService
 
         [OperationContract]
         bool Ping();
+
+        [OperationContract]
+        void ReportarDesconexionInesperada(string nombreJugador, string codigoSala);
     }
 
     public interface IPartidaCallback

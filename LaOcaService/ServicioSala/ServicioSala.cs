@@ -198,6 +198,58 @@ namespace LaOcaService
             return true; // Si el servidor responde, devuelve verdadero.
         }
 
+        public void ReportarDesconexionInesperada(string nombreJugador, string codigoSala)
+        {
+            if (_ListaSalasActivas.ContainsKey(codigoSala))
+            {
+                Sala sala = _ListaSalasActivas[codigoSala];
+
+                if (sala.Jugadores.ContainsKey(nombreJugador))
+                {
+                    // Eliminar el jugador desconectado
+                    sala.Jugadores.Remove(nombreJugador);
+                    sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Remove(nombreJugador);
+
+                    // Notificar a los demás jugadores
+                    foreach (var jugador in sala.Jugadores.Values)
+                    {
+                        try
+                        {
+                            if (jugador.CanalCallbackPartida != null)
+                            {
+                                jugador.CanalCallbackPartida.NotificarAbandonoJugador(nombreJugador);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Error: Callback nulo para el jugador {jugador.NombreUsuario}.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error notificando abandono para {jugador.NombreUsuario}: {ex.Message}");
+                        }
+                    }
+
+                    // Verificar si queda solo un jugador
+                    if (sala.Jugadores.Count == 1)
+                    {
+                        var jugadorRestante = sala.Jugadores.Values.First();
+                        jugadorRestante.HaLlegadoAMeta = true;
+
+                        try
+                        {
+                            jugadorRestante.CanalCallbackPartida?.MostrarMensajeExito("Has ganado la partida por default.");
+                            FinalizarPartidaYNotificar(sala, jugadorRestante);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error inesperado: {ex.Message}");
+                        }
+                    }
+                }
+            }
+        }
+
         public void NotificarMovimientoFicha(int posicion, string nombreJugador, string codigoSala)
         {
             if (_ListaSalasActivas.ContainsKey(codigoSala))
@@ -404,9 +456,31 @@ namespace LaOcaService
             {
                 if (_ListaSalasActivas[codigoSala].Jugadores.ContainsKey(nombreJugador))
                 {
-                    _ListaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackPartida = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
+                    var canal = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
+
+                    // Suscripción a eventos de desconexión
+                    ICommunicationObject canalComunicacion = (ICommunicationObject)canal;
+
+                    canalComunicacion.Faulted += (sender, e) =>
+                    {
+                        ManejarDesconexionInesperada(nombreJugador, codigoSala);
+                    };
+
+                    canalComunicacion.Closed += (sender, e) =>
+                    {
+                        ManejarDesconexionInesperada(nombreJugador, codigoSala);
+                    };
+
+                    _ListaSalasActivas[codigoSala].Jugadores[nombreJugador].CanalCallbackPartida = canal;
                 }
             }
+        }
+
+        private void ManejarDesconexionInesperada(string nombreJugador, string codigoSala)
+        {
+            Console.WriteLine($"Jugador {nombreJugador} desconectado inesperadamente.");
+
+            ReportarDesconexionInesperada(nombreJugador, codigoSala);
         }
 
         public string PasarTurnoASiguienteJugador(int posicionJugadorTurnoActual, string codigoSala)

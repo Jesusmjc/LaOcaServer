@@ -195,7 +195,7 @@ namespace LaOcaService
     {
         public bool Ping()
         {
-            return true; // Si el servidor responde, devuelve verdadero.
+            return true;
         }
 
         public void ReportarDesconexionInesperada(string nombreJugador, string codigoSala)
@@ -206,11 +206,9 @@ namespace LaOcaService
 
                 if (sala.Jugadores.ContainsKey(nombreJugador))
                 {
-                    // Eliminar el jugador desconectado
                     sala.Jugadores.Remove(nombreJugador);
                     sala.Partida.NombresDeJugadoresEnOrdenDeTurnos.Remove(nombreJugador);
 
-                    // Notificar a los demás jugadores
                     foreach (var jugador in sala.Jugadores.Values)
                     {
                         try
@@ -230,7 +228,6 @@ namespace LaOcaService
                         }
                     }
 
-                    // Verificar si queda solo un jugador
                     if (sala.Jugadores.Count == 1)
                     {
                         var jugadorRestante = sala.Jugadores.Values.First();
@@ -458,7 +455,6 @@ namespace LaOcaService
                 {
                     var canal = OperationContext.Current.GetCallbackChannel<IPartidaCallback>();
 
-                    // Suscripción a eventos de desconexión
                     ICommunicationObject canalComunicacion = (ICommunicationObject)canal;
 
                     canalComunicacion.Faulted += (sender, e) =>
